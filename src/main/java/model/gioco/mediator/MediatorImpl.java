@@ -1,46 +1,38 @@
 package model.gioco.mediator;
 
 
-import controller.gioco.GiocoPresenter;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
+import model.gioco.GiocoModel;
 import view.interfacce.schermata.SchermataGioco;
 
 import java.util.List;
 
+@Log4j2
 public class MediatorImpl implements Mediator {
 
     private SchermataGioco view;
-    private GiocoPresenter giocoPresenter;
+    private GiocoModel giocoModel;
+    @Getter
+    private int risultato;
+
 
     /**
-     *
-     *
+     * start notificato da giocoModel dopo la creazione della tabella
      */
 
-    @Override
-    public void create( String nomeFile) {
-        giocoPresenter.setTabella( nomeFile);
-    }
 
-    public void addPlayers(){
-        List<Giocatore> giocatori=view.getInfoPlayers();
-        giocoPresenter.setGiocatori(giocatori);
-    }
-    /**
-     * start notificato da giocoPresenter dopo la creazione della tabella
-     */
 
     @Override
     public void start() {
-        if( view == null || giocoPresenter == null)
+        if( view == null || giocoModel == null)
             throw new NullPointerException();
 
-
-        view.setGiocatoreCorrente(giocoPresenter.getGiocatoreCorrente() );
-
-//        // Imposta lo stato iniziale del turno
-//        MediatorImpl.setStatoTurno(MediatorImpl.StatoTurno.IN_ATTESA_LANCIO);
+        view.mostraTabellaGrafica(giocoModel.getTabellaModel());
+        view.mostraGiocatori(giocoModel.getGiocatori());
+        view.setGiocatoreCorrente(giocoModel.getGiocatoreCorrente() );
 
     }
 
@@ -51,7 +43,7 @@ public class MediatorImpl implements Mediator {
     @Override
     public void notifyDiceRoll() {
         // Gestisci il lancio dei dadi
-        int risultato= giocoPresenter.lanciaDado();
+        this.risultato= giocoModel.lanciaDado();
         view.mostraRisultatoDado(risultato);
     }
 
@@ -62,22 +54,27 @@ public class MediatorImpl implements Mediator {
     @Override
     public void notifyPlayerMove() {
         // Muovi il giocatore verso la destinazione
-        List<Posizione> percorso = giocoPresenter.muoviGiocatore();
-        view.animaMossa( percorso);
+        System.out.println("Sto per animare:");
+        List<Posizione> percorso = giocoModel.calcolaPercorso(risultato);
 
+        view.animaMossa(percorso);
     }
 
     @Override
     public void notifyTurnChange() {
-        view.setGiocatoreCorrente(giocoPresenter.getGiocatoreCorrente());
+        giocoModel.prossimoTurno();
+        view.setGiocatoreCorrente(giocoModel.getGiocatoreCorrente());
+
     }
 
     @Override
     public void notifyPlayerStop() {
-        if(giocoPresenter.fineGioco()){
+        if(giocoModel.verificaVincitore()){
             view.mostraVincitore();
         }else{
-            giocoPresenter.cambiaGiocatore();
+            giocoModel.giocatoreFermo();
+            log.info("Sto cambiando il turno");
+            notifyTurnChange();
         }
     }
 
@@ -88,9 +85,10 @@ public class MediatorImpl implements Mediator {
     }
 
     @Override
+    public void registerGameManager(GiocoModel giocoModel) {
+        this.giocoModel= giocoModel;
 
-    public void registerGameManager(GiocoPresenter giocoPresenter) {
-        this.giocoPresenter = giocoPresenter;
+
     }
 
 

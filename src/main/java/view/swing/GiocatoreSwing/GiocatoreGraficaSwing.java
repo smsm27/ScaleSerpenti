@@ -53,8 +53,8 @@ public class GiocatoreGraficaSwing extends JPanel implements GiocatoreGrafico {
     }
 
     @Override
-    public model.giocatore.Giocatore getGiocatore() {
-        return null;
+    public Giocatore getGiocatore() {
+        return giocatore;
     }
 
     @Override

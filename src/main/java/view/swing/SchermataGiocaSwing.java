@@ -1,7 +1,10 @@
 package view.swing;
 
+
+import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
+import model.gioco.GiocoModel;
 import model.gioco.mediator.MediatorImpl;
 import tools.Colori;
 import view.interfacce.schermata.AbstractSchermataSwing;
@@ -11,30 +14,69 @@ import view.swing.GiocatoreSwing.GiocatoreGraficaSwing;
 
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.io.File;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
+
+@Log4j2
 
 public class SchermataGiocaSwing extends AbstractSchermataSwing implements SchermataGioco, DialogoGioco {
     private JButton lanciaDadoButton;
-    private final Colori colori;
+    private GameInfoSwing gameInfoPanel;
+    private Colori colori;
     private MediatorImpl mediator=new MediatorImpl();
     private Map<Color, GiocatoreGraficaSwing> giocatoriGrafici = new HashMap<>();
     private GiocatoreGraficaSwing giocatoreCurr;
 
 
-    public SchermataGiocaSwing(Colori colori) {
-        this.colori = colori;
+    public void mostraGiocatori(List<Giocatore> giocatori){
+        for (Giocatore g : giocatori) {
+            GiocatoreGraficaSwing giocatore = new GiocatoreGraficaSwing(g);
+            giocatore.setBounds((int)g.getPosizione().getX(),
+                    (int)g.getPosizione().getY(),
+                    30, 30); // Imposta dimensioni e posizione
+            giocatoriGrafici.put(g.getColor(),giocatore);
+            log.info(giocatoriGrafici.toString());
+            panel.add(giocatore, JLayeredPane.MODAL_LAYER );
+        }
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.LIGHT_GRAY); // Per renderlo visibile durante il debug
+
+        // Crea il bottone per lanciare il dado
+        lanciaDadoButton = new JButton("Lancia Dado");
+        lanciaDadoButton.addActionListener(e -> {
+
+            if (mediator != null && giocatoreCurr != null) {
+                mediator.notifyDiceRoll();
+
+
+            }
+        });
+
+        // Aggiungi il bottone al pannello dei bottoni
+        buttonPanel.add(lanciaDadoButton);
+
+        // Assicurati che tutto sia visibile
+        lanciaDadoButton.setVisible(true);
+        buttonPanel.setVisible(true);
+
+        // Debug
+        System.out.println("Button visible: " + lanciaDadoButton.isVisible());
+        System.out.println("Button panel visible: " + buttonPanel.isVisible());
+
+        return buttonPanel;
     }
 
     @Override
     public void mostraRisultatoDado(int risultato) {
         int ris =JOptionPane.showOptionDialog(panel,
-                "Giocatore: " + giocatoreCurr +
+                "Giocatore: " + this.giocatoreCurr.getGiocatore().getNome()  +
                         "Hai fatto: " + risultato,
                 "Lancio",
                 JOptionPane.DEFAULT_OPTION,
@@ -42,7 +84,9 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
                 null,
                 new Object[]{"OK"},
                 "OK");
-        if(risultato == JOptionPane.OK_OPTION) {
+        if(ris == JOptionPane.OK_OPTION) {
+
+            log.info("Sto per muovermi");
             mediator.notifyPlayerMove();
         }
 
@@ -57,7 +101,9 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
     @Override
     public void setGiocatoreCorrente(Giocatore giocatore) {
         giocatoreCurr = giocatoriGrafici.get(giocatore.getColor());
+        log.info("ecco giocatorecurr: {}", giocatoreCurr.getName());
         lanciaDadoButton.setEnabled(true);
+        refresh();
     }
 
     @Override
@@ -72,18 +118,19 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
                 currentStep[0]++;
             } else {
                 timer.stop();
+                log.info("mi sto fermando");
                 mediator.notifyPlayerStop();
             }
         });
         timer.start();
-        mediator.notifyPlayerStop();
+
     }
 
 
     @Override
     public void mostraVincitore() {
         int option = JOptionPane.showOptionDialog(panel,
-                "Hai vinto: " + giocatoreCurr.getName(),
+                "Hai vinto: " + giocatoreCurr.getGiocatore().getNome(),
                 "Lancio",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.INFORMATION_MESSAGE,
@@ -98,33 +145,52 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
 
     @Override
     public void inizializza() {
+
         initComponents();
+        colori = new Colori();
         String nomeMappa=getNomeMappa();
-        if (nomeMappa != null) {
-            mediator.create( nomeMappa);
-        }
+        List<Giocatore> giocatori=getInfoPlayers();
+
+        GiocoModel giocoModel= new GiocoModel(nomeMappa,giocatori);
+
+
+
+        mediator.registerGameManager(giocoModel);
+        mediator.registerView(this);
+
+        gameInfoPanel.setGiocoModel(giocoModel);
+        //Inizializzo il Listener
+        giocoModel.addListener(gameInfoPanel);
+
+
+        mediator.start();
+
 
     }
 
     private void initComponents(){
+
         frame = new JFrame("Serpi e Scale");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 800);
+
+        JMenuBar menuBar = new JMenuBar();
+        aggiungiMenuTornaMenu(menuBar);
+        frame.setJMenuBar(menuBar);
+
         // Crea il pannello principale
         panel = new JLayeredPane();
+        frame.add(panel, BorderLayout.CENTER);
 
-        // Crea il bottone per lanciare il dado
-        lanciaDadoButton = new JButton("Lancia Dado");
-        lanciaDadoButton.setBounds(650, 700, 120, 40);
-        lanciaDadoButton.addActionListener(e -> {
-            if (mediator != null && giocatoreCurr != null) {
-                mediator.notifyDiceRoll();
-            }
-        });
+        //Creazione Pannelli
+        JPanel buttonPanel = createButtonPanel();
+        gameInfoPanel = new GameInfoSwing();
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+        frame.add(gameInfoPanel, BorderLayout.NORTH);
 
-        // Aggiungi il bottone al pannello
-        panel.add(lanciaDadoButton);
+
         frame.add(panel);
+        frame.setVisible(true);
     }
 
     @Override
@@ -150,6 +216,7 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
                         Giocatore giocatore = getInfoPlayer();
                         giocatori.add(giocatore);
                     }
+
 
                     return giocatori;
 
@@ -190,7 +257,8 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
         if (result == JOptionPane.OK_OPTION) {
             String nome = nomeField.getText();
             String coloreSelezionato = (String) coloreCombo.getSelectedItem();
-            Giocatore g = new Giocatore(nome, caselleGrafiche.getFirst().getCasella().getPosizione(), colori.getColori().get(coloreSelezionato));
+            Giocatore g = new Giocatore(nome, colori.getColori().get(coloreSelezionato));
+
             colori.getColori().remove(coloreSelezionato);
             return g;
         }
@@ -219,7 +287,7 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
             mapNames[i] = files[i].getName().replace(".ser", "");
         }
 
-        String scelta = (String) JOptionPane.showInputDialog(
+        return (String) JOptionPane.showInputDialog(
                 frame,
                 "Seleziona una mappa da caricare:",
                 "Carica Mappa",
@@ -228,7 +296,6 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
                 mapNames,
                 mapNames[0]
         );
-        return scelta;
     }
 
 

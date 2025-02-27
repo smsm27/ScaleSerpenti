@@ -12,7 +12,6 @@ public class Casella implements Serializable {
     private Posizione posizione;
     private Integer indice;
     private CasellaFlyweight casellaFlyweight;
-
     private Casella destinazione=null;
     private CasellaState casellaState;
 

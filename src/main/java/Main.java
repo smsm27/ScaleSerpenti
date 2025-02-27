@@ -1,9 +1,15 @@
-import view.interfacce.schermata.SchermataCreazione;
-import view.swing.SchermataCreazioneSwing;
+
+
+
+
+import view.swing.SchermataInizialeSwing;
+
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        SchermataCreazione view = new SchermataCreazioneSwing();
-        view.inizializza();
+        SwingUtilities.invokeLater(() -> {
+            SchermataInizialeSwing.getInstance().inizializza();
+        });
     }
 }

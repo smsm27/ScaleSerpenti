@@ -4,7 +4,7 @@ import view.swing.SchermataGiocaSwing;
 
 public class MainGioca {
     public static void main(String[] args) {
-        SchermataGioco schermataGioco =new SchermataGiocaSwing(new Colori());
+        SchermataGioco schermataGioco =new SchermataGiocaSwing();
         schermataGioco.inizializza();
     }
 }

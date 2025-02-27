@@ -24,7 +24,7 @@ public class CreazioneTabellaController {
     public void creaNuovaTabella(int numCaselle, int dimX, int dimY, String sfondoPath, String casellaPath) {
         tabella.creaNuovaTabella(numCaselle, dimX,dimY,casellaPath );
         view.pulisciVista();
-        view.mostraTabellaGrafica(tabella.getCaselle());
+        view.mostraTabellaGrafica(tabella);
     }
 
     public void aggiungiCasellaSpeciale(String tipo, int partenza, int destinazione) {
@@ -49,16 +49,7 @@ public class CreazioneTabellaController {
 
     public void caricaTabella(String nomeFile) {
         tabella.caricaTabella(nomeFile);
-        view.mostraTabellaGrafica(tabella.getCaselle());
-        for(Map.Entry<Integer, Casella> entry: tabella.getOggettiSpeciali().entrySet()) {
-            if(tabella.isCasellaSpecialeComplessa(entry.getKey()) ){
-                view.mostraElementoGrafico(
-                        elementoGraficoFactory.creaElemento(entry.getValue(),
-                                tabella.getCasella(entry.getValue().getDestinazione().getIndice()))
-                );
-            }
+        view.mostraTabellaGrafica(tabella);
 
-
-        }
     }
 }

@@ -2,6 +2,7 @@ package view.swing;
 
 import controller.creazione.CreazioneTabellaController;
 import model.casella.Casella;
+import model.giocatore.Giocatore;
 import view.interfacce.schermata.AbstractSchermataSwing;
 import view.interfacce.schermata.Dialogo;
 import view.interfacce.schermata.SchermataCreazione;
@@ -18,26 +19,19 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
     private CreazioneTabellaController controller;
 
     @Override
-    public void mostraTabellaGrafica(List<Casella> caselle) {
-        pulisciVista();
-        for (Casella casella : caselle) {
-            CasellaGraficaSwing casellaGrafica = new CasellaGraficaSwing(casella);
-            caselleGrafiche.add(casellaGrafica);
-            panel.add(casellaGrafica, JLayeredPane.DEFAULT_LAYER);
-        }
-        refresh();
-    }
-
-    @Override
     public void rimuoviElementoGrafico(int indice) {
         //TODO
     }
+
+    @Override
+    public void mostraGiocatori(List<Giocatore> giocatori) {}
 
     @Override
     public void inizializza() {
         initComponents();
         setupEventHandlers();
         controller = new CreazioneTabellaController(this,new ElementoGraficoSwingFactory());
+
     }
 
     /**
@@ -57,25 +51,27 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
         JMenu menu = new JMenu("Opzioni");
 
         JMenuItem creaMappaItem = new JMenuItem("Crea Mappa");
-        JMenuItem giocaItem = new JMenuItem("Gioca");
+
         JMenuItem addSerpenteItem = new JMenuItem("Add Serpente");
         JMenuItem addScalaItem = new JMenuItem("Add Scala");
         JMenuItem salvaItem = new JMenuItem("Salva Tabella");
         JMenuItem caricaItem = new JMenuItem("Carica Tabella");
 
         menu.add(creaMappaItem);
-        menu.add(giocaItem);
+
         menu.add(addSerpenteItem);
         menu.add(addScalaItem);
         menu.add(salvaItem);
         menu.add(caricaItem);
         menuBar.add(menu);
 
+        aggiungiMenuTornaMenu(menuBar);
+
         frame.setJMenuBar(menuBar);
 
         panel = new JLayeredPane();
         frame.add(panel);
-        frame.setVisible(true);
+
     }
 
     /**
@@ -131,6 +127,7 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
         if (scelta != null) {
             controller.caricaTabella(scelta);
         }
+        frame.setVisible(true);
     }
 
     @Override
@@ -258,6 +255,7 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
                 mostraMessaggio("Inserire valori validi!", "Errore", JOptionPane.ERROR_MESSAGE);
             }
         }
+        frame.setVisible(true);
 
     }
 }

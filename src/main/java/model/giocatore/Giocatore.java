@@ -17,13 +17,13 @@ public class Giocatore {
     private Color color;
 
 
-    public Giocatore(String nome, Posizione posizione, Color color) {
+    public Giocatore(String nome, Color color) {
         this.nome = nome;
-        this.posizione = posizione;
         this.color = color;
         this.stato= GiocatoreStato.ATTIVO;
         this.indiceCurr=0;
     }
+
 
     public enum GiocatoreStato {
         FERMO,
