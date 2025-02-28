@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
-import model.gioco.mediator.MediatorImpl;
 import model.tabella.TabellaModel;
 import model.casella.Casella;
 
@@ -36,14 +35,12 @@ public class GiocoModel {
     private TabellaModel tabellaModel;
     private int giocatoreCorrenteIndex;
     private Random random;
-
     @Getter
     @Setter
     private StatoTurno statoTurno;
     @Getter
     int risultato;
 
-    private List<Posizione> posizioni;
     private List<GiocoListener> listeners = new ArrayList<>();
 
     // Metodi per gestire i listeners
@@ -67,8 +64,6 @@ public class GiocoModel {
         notifyListeners();
     }
 
-
-
     public GiocoModel(String nomeMappa,List<Giocatore> giocatoriNonOrdinati) {
         this.random = new Random();
         this.giocatoreCorrenteIndex = 0;
@@ -82,8 +77,6 @@ public class GiocoModel {
         this.statoTurno = StatoTurno.IN_ATTESA_LANCIO;
         notifyListeners();
     }
-
-
 
     public Giocatore getGiocatoreCorrente() {
         return giocatori.get(giocatoreCorrenteIndex);

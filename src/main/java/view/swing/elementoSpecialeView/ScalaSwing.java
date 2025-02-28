@@ -13,6 +13,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 @Getter
 public class ScalaSwing extends JPanel implements ElementoGrafico {
@@ -42,7 +43,7 @@ public class ScalaSwing extends JPanel implements ElementoGrafico {
     @Override
     public void caricaImmagine() {
         try {
-            scala = ImageIO.read(new File("src/main/img/scala.png"));
+            scala = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/img/scala.png")) );
 
         } catch (IOException e) {
             System.err.println("Errore nel caricamento delle immagini: " + e.getMessage());

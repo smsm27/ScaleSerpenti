@@ -10,10 +10,12 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Random;
 
 public class SerpenteSwing extends JPanel implements ElementoGrafico {
@@ -70,9 +72,9 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
     @Override
     public void caricaImmagine() {
         try {
-            texture = ImageIO.read(new File("src/main/img/serpenteBody.png"));
-            testaImage = ImageIO.read(new File("src/main/img/serpenteTp.png"));
-            codaImage = ImageIO.read(new File("src/main/img/serpenteC.png"));
+            texture = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/img/serpenteBody.png")));
+            testaImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/img/serpenteTp.png")));
+            codaImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/img/serpenteC.png")));
 
             // Crea versioni colorate delle immagini
             coloraImmagini();
@@ -192,54 +194,83 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
                 destinazione.getY() - getY() + destinazione.getHeight() / 2
         );
 
-        // Calcola i punti di controllo per la curva di Bezier
+        // Calcola la distanza e l'angolo di base
         double distanzaX = end.getX() - start.getX();
         double distanzaY = end.getY() - start.getY();
         double lunghezza = Math.sqrt(distanzaX * distanzaX + distanzaY * distanzaY);
+        double angoloBase = Math.atan2(distanzaY, distanzaX);
 
-        // Calcola l'angolo della linea tra inizio e fine
-        double angolo = Math.atan2(distanzaY, distanzaX);
+        // Crea un percorso con più punti per simulare una funzione seno
+        Path2D.Double path = new Path2D.Double();
 
-        // Determina la direzione della curva (sopra o sotto la linea diretta)
-        double offset = lunghezza * curvatura;
-        double perpendicolarX = Math.sin(angolo) * offset;
-        double perpendicolarY = -Math.cos(angolo) * offset;
+        // Numero di segmenti per la curva seno
+        int segmenti = 30;
 
-        // Punti di controllo per la curva di Bezier
-        Point2D ctrl1 = new Point2D.Double(
-                start.getX() + distanzaX * 0.3 + perpendicolarX,
-                start.getY() + distanzaY * 0.3 + perpendicolarY
-        );
+        // Ampiezza della curva seno
+        double ampiezza = lunghezza * curvatura * 0.8;
 
-        Point2D ctrl2 = new Point2D.Double(
-                start.getX() + distanzaX * 0.7 + perpendicolarX,
-                start.getY() + distanzaY * 0.7 + perpendicolarY
-        );
+        // Frequenza - controlla quante "onde" ci sono
+        double frequenza = 1.0; // Un'onda completa
 
-        // Crea la curva di Bezier
-        CubicCurve2D curve = new CubicCurve2D.Double(
-                start.getX(), start.getY(),
-                ctrl1.getX(), ctrl1.getY(),
-                ctrl2.getX(), ctrl2.getY(),
-                end.getX(), end.getY()
-        );
+        // Array per memorizzare i punti del percorso
+        Point2D.Double[] pathPoints = new Point2D.Double[segmenti + 1];
 
-        // Disegna il corpo del serpente usando la texture colorata
-        if (textureColorata != null) {
-            g2.setStroke(new BasicStroke(spessoreCorpo, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            TexturePaint texturePaint = new TexturePaint(textureColorata, new Rectangle(0, 0, 20, 10));
-            g2.setPaint(texturePaint);
-            g2.draw(curve);
+        // Calcola tutti i punti del percorso
+        for (int i = 0; i <= segmenti; i++) {
+            double t = (double) i / segmenti;
+
+            // Calcola la posizione lungo la linea diretta
+            double x = start.getX() + distanzaX * t;
+            double y = start.getY() + distanzaY * t;
+
+            // Calcola lo spostamento perpendicolare basato sulla funzione seno
+            double sinValue = Math.sin(t * Math.PI * 2 * frequenza);
+            double offsetX = Math.sin(angoloBase) * sinValue * ampiezza;
+            double offsetY = -Math.cos(angoloBase) * sinValue * ampiezza;
+
+            // Memorizza il punto
+            pathPoints[i] = new Point2D.Double(x + offsetX, y + offsetY);
+
+            // Aggiungi il punto al percorso
+            if (i == 0) {
+                path.moveTo(x + offsetX, y + offsetY);
+            } else {
+                path.lineTo(x + offsetX, y + offsetY);
+            }
         }
 
-        // Calcola angoli per testa e coda
-        double angoloTesta = calcolaAngoloTangente(curve, 0.0);
-        double angoloCoda = calcolaAngoloTangente(curve, 1.0);
+        // Disegna il corpo del serpente usando solo il colore
+        // Utilizziamo direttamente il colore casuale generato
+        g2.setStroke(new BasicStroke(spessoreCorpo, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(coloreSerpenteRandom);
+        g2.draw(path);
+
+        // Calcola l'angolo della testa basato sulla direzione del primo segmento
+        double angoloTesta;
+        if (segmenti >= 1) {
+            angoloTesta = Math.atan2(
+                    pathPoints[1].y - pathPoints[0].y,
+                    pathPoints[1].x - pathPoints[0].x
+            );
+        } else {
+            angoloTesta = angoloBase;
+        }
+
+        // Calcola l'angolo della coda basato sulla direzione dell'ultimo segmento
+        double angoloCoda;
+        if (segmenti >= 1) {
+            angoloCoda = Math.atan2(
+                    pathPoints[segmenti].y - pathPoints[segmenti-1].y,
+                    pathPoints[segmenti].x - pathPoints[segmenti-1].x
+            );
+        } else {
+            angoloCoda = angoloBase;
+        }
 
         // Disegna la testa colorata
         if (testaColorata != null) {
             AffineTransform oldTransform = g2.getTransform();
-            g2.translate(start.getX(), start.getY());
+            g2.translate(pathPoints[0].x, pathPoints[0].y);
             g2.rotate(angoloTesta);
             int testaWidth = (int)(testaColorata.getWidth() * scalaTesta);
             int testaHeight = (int)(testaColorata.getHeight() * scalaTesta);
@@ -250,7 +281,7 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
         // Disegna la coda colorata
         if (codaColorata != null) {
             AffineTransform oldTransform = g2.getTransform();
-            g2.translate(end.getX(), end.getY());
+            g2.translate(pathPoints[segmenti].x, pathPoints[segmenti].y);
             g2.rotate(angoloCoda + Math.PI); // Ruota di 180° per la coda
             int codaWidth = (int)(codaColorata.getWidth() * scalaCoda);
             int codaHeight = (int)(codaColorata.getHeight() * scalaCoda);
@@ -259,27 +290,7 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
         }
     }
 
-    /**
-     * Calcola l'angolo della tangente alla curva nel punto specificato (0-1)
-     */
-    private double calcolaAngoloTangente(CubicCurve2D curve, double t) {
-        // Parametri della curva
-        double x0 = curve.getX1();
-        double y0 = curve.getY1();
-        double x1 = curve.getCtrlX1();
-        double y1 = curve.getCtrlY1();
-        double x2 = curve.getCtrlX2();
-        double y2 = curve.getCtrlY2();
-        double x3 = curve.getX2();
-        double y3 = curve.getY2();
 
-        // Calcola la derivata della curva di Bezier nel punto t
-        double dx = 3 * (1-t)*(1-t) * (x1-x0) + 6 * (1-t)*t * (x2-x1) + 3 * t*t * (x3-x2);
-        double dy = 3 * (1-t)*(1-t) * (y1-y0) + 6 * (1-t)*t * (y2-y1) + 3 * t*t * (y3-y2);
-
-        // Restituisce l'angolo della tangente
-        return Math.atan2(dy, dx);
-    }
 
     @Override
     public void disegna(Graphics g) {

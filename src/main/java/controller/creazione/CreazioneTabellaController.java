@@ -1,13 +1,10 @@
 package controller.creazione;
 
 
-import model.casella.Casella;
 import model.tabella.TabellaModel;
 import view.interfacce.elementoGrafico.ElementoGrafico;
 import view.interfacce.elementoGrafico.ElementoGraficoFactory;
 import view.interfacce.schermata.SchermataCreazione;
-
-import java.util.Map;
 
 
 public class CreazioneTabellaController {
@@ -21,10 +18,10 @@ public class CreazioneTabellaController {
         this.elementoGraficoFactory = elementoFactory;
     }
 
-    public void creaNuovaTabella(int numCaselle, int dimX, int dimY, String sfondoPath, String casellaPath) {
+    public void creaNuovaTabella(int numCaselle, int dimX, int dimY,  String casellaPath) {
         tabella.creaNuovaTabella(numCaselle, dimX,dimY,casellaPath );
         view.pulisciVista();
-        view.mostraTabellaGrafica(tabella);
+        view.mostraTabella(tabella);
     }
 
     public void aggiungiCasellaSpeciale(String tipo, int partenza, int destinazione) {
@@ -42,14 +39,13 @@ public class CreazioneTabellaController {
         }
     }
 
-
     public String salvaTabella(String nomeFile) {
         return tabella.salvaTabella(nomeFile);
     }
 
     public void caricaTabella(String nomeFile) {
         tabella.caricaTabella(nomeFile);
-        view.mostraTabellaGrafica(tabella);
+        view.mostraTabella(tabella);
 
     }
 }

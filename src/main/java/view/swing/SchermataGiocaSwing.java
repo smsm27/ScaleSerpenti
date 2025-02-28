@@ -7,8 +7,7 @@ import model.giocatore.Giocatore;
 import model.gioco.GiocoModel;
 import model.gioco.mediator.MediatorImpl;
 import tools.Colori;
-import view.interfacce.schermata.AbstractSchermataSwing;
-import view.interfacce.schermata.DialogoGioco;
+import view.astrazioni.schermata.AbstractSchermataSwing;
 import view.interfacce.schermata.SchermataGioco;
 import view.swing.GiocatoreSwing.GiocatoreGraficaSwing;
 
@@ -16,14 +15,13 @@ import view.swing.GiocatoreSwing.GiocatoreGraficaSwing;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
-import java.io.File;
 
 import java.util.*;
 import java.util.List;
 
 @Log4j2
 
-public class SchermataGiocaSwing extends AbstractSchermataSwing implements SchermataGioco, DialogoGioco {
+public class SchermataGiocaSwing extends AbstractSchermataSwing implements SchermataGioco {
     private JButton lanciaDadoButton;
     private GameInfoSwing gameInfoPanel;
     private Colori colori;
@@ -31,17 +29,29 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
     private Map<Color, GiocatoreGraficaSwing> giocatoriGrafici = new HashMap<>();
     private GiocatoreGraficaSwing giocatoreCurr;
 
+    private void initComponents(){
 
-    public void mostraGiocatori(List<Giocatore> giocatori){
-        for (Giocatore g : giocatori) {
-            GiocatoreGraficaSwing giocatore = new GiocatoreGraficaSwing(g);
-            giocatore.setBounds((int)g.getPosizione().getX(),
-                    (int)g.getPosizione().getY(),
-                    30, 30); // Imposta dimensioni e posizione
-            giocatoriGrafici.put(g.getColor(),giocatore);
-            log.info(giocatoriGrafici.toString());
-            panel.add(giocatore, JLayeredPane.MODAL_LAYER );
-        }
+        frame = new JFrame("Serpi e Scale");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 800);
+
+        JMenuBar menuBar = new JMenuBar();
+        aggiungiTornaMenu(menuBar);
+        frame.setJMenuBar(menuBar);
+
+        // Crea il pannello principale
+        panel = new JLayeredPane();
+        frame.add(panel, BorderLayout.CENTER);
+
+        //Creazione Pannelli
+        JPanel buttonPanel = createButtonPanel();
+        gameInfoPanel = new GameInfoSwing();
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+        frame.add(gameInfoPanel, BorderLayout.NORTH);
+
+
+        frame.add(panel);
+        frame.setVisible(true);
     }
 
     private JPanel createButtonPanel() {
@@ -74,81 +84,11 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
     }
 
     @Override
-    public void mostraRisultatoDado(int risultato) {
-        int ris =JOptionPane.showOptionDialog(panel,
-                "Giocatore: " + this.giocatoreCurr.getGiocatore().getNome()  +
-                        "Hai fatto: " + risultato,
-                "Lancio",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                null,
-                new Object[]{"OK"},
-                "OK");
-        if(ris == JOptionPane.OK_OPTION) {
-
-            log.info("Sto per muovermi");
-            mediator.notifyPlayerMove();
-        }
-
-    }
-
-    @Override
-    public void spostaGiocatore( Posizione posizione) {
-        giocatoreCurr.spostaA(posizione);
-        panel.repaint();
-    }
-
-    @Override
-    public void setGiocatoreCorrente(Giocatore giocatore) {
-        giocatoreCurr = giocatoriGrafici.get(giocatore.getColor());
-        log.info("ecco giocatorecurr: {}", giocatoreCurr.getName());
-        lanciaDadoButton.setEnabled(true);
-        refresh();
-    }
-
-    @Override
-    public void animaMossa( List<Posizione> posizioni) {
-        lanciaDadoButton.setEnabled(false);
-        Timer timer = new Timer(500, null);
-        final int[] currentStep = {0};
-
-        timer.addActionListener(e -> {
-            if (currentStep[0] < posizioni.size()) {
-                spostaGiocatore( posizioni.get(currentStep[0]));
-                currentStep[0]++;
-            } else {
-                timer.stop();
-                log.info("mi sto fermando");
-                mediator.notifyPlayerStop();
-            }
-        });
-        timer.start();
-
-    }
-
-
-    @Override
-    public void mostraVincitore() {
-        int option = JOptionPane.showOptionDialog(panel,
-                "Hai vinto: " + giocatoreCurr.getGiocatore().getNome(),
-                "Lancio",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                null,
-                new Object[]{"OK"},
-                "OK");
-        //notifica su ok
-        if (option == 0) {
-
-        }
-    }
-
-    @Override
     public void inizializza() {
 
         initComponents();
         colori = new Colori();
-        String nomeMappa=getNomeMappa();
+        String nomeMappa= getNomeTabella();
         List<Giocatore> giocatori=getInfoPlayers();
 
         GiocoModel giocoModel= new GiocoModel(nomeMappa,giocatori);
@@ -166,31 +106,6 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
         mediator.start();
 
 
-    }
-
-    private void initComponents(){
-
-        frame = new JFrame("Serpi e Scale");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
-
-        JMenuBar menuBar = new JMenuBar();
-        aggiungiMenuTornaMenu(menuBar);
-        frame.setJMenuBar(menuBar);
-
-        // Crea il pannello principale
-        panel = new JLayeredPane();
-        frame.add(panel, BorderLayout.CENTER);
-
-        //Creazione Pannelli
-        JPanel buttonPanel = createButtonPanel();
-        gameInfoPanel = new GameInfoSwing();
-        frame.add(buttonPanel, BorderLayout.SOUTH);
-        frame.add(gameInfoPanel, BorderLayout.NORTH);
-
-
-        frame.add(panel);
-        frame.setVisible(true);
     }
 
     @Override
@@ -267,36 +182,94 @@ public class SchermataGiocaSwing extends AbstractSchermataSwing implements Scher
     }
 
     @Override
-    public String getNomeMappa() {
-        File directory = new File("src/main/save");
-        if (!directory.exists() || !directory.isDirectory()) {
-            JOptionPane.showMessageDialog(frame, "Nessuna mappa salvata trovata!",
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-            return null;
+    public void mostraGiocatori(List<Giocatore> giocatori){
+        for (Giocatore g : giocatori) {
+            GiocatoreGraficaSwing giocatore = new GiocatoreGraficaSwing(g);
+            giocatore.setBounds((int)g.getPosizione().getX(),
+                    (int)g.getPosizione().getY(),
+                    30, 30); // Imposta dimensioni e posizione
+            giocatoriGrafici.put(g.getColor(),giocatore);
+            log.info(giocatoriGrafici.toString());
+            panel.add(giocatore, JLayeredPane.MODAL_LAYER );
         }
-
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".ser"));
-        if (files == null || files.length == 0) {
-            JOptionPane.showMessageDialog(frame, "Nessuna mappa salvata trovata!",
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
-
-        String[] mapNames = new String[files.length];
-        for (int i = 0; i < files.length; i++) {
-            mapNames[i] = files[i].getName().replace(".ser", "");
-        }
-
-        return (String) JOptionPane.showInputDialog(
-                frame,
-                "Seleziona una mappa da caricare:",
-                "Carica Mappa",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                mapNames,
-                mapNames[0]
-        );
     }
+
+    @Override
+    public void setGiocatoreCorrente(Giocatore giocatore) {
+        giocatoreCurr = giocatoriGrafici.get(giocatore.getColor());
+        log.info("ecco giocatorecurr: {}", giocatoreCurr.getName());
+        lanciaDadoButton.setEnabled(true);
+        refresh();
+    }
+
+    @Override
+    public void mostraRisultatoDado(int risultato) {
+        int ris =JOptionPane.showOptionDialog(panel,
+                "Giocatore: " + this.giocatoreCurr.getGiocatore().getNome()  +
+                        "Hai fatto: " + risultato,
+                "Lancio",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                new Object[]{"OK"},
+                "OK");
+        if(ris == JOptionPane.OK_OPTION) {
+
+            log.info("Sto per muovermi");
+            mediator.notifyPlayerMove();
+        }
+
+    }
+
+    @Override
+    public void spostaGiocatore( Posizione posizione) {
+        giocatoreCurr.spostaA(posizione);
+        panel.repaint();
+    }
+
+    @Override
+    public void animaMossa( List<Posizione> posizioni) {
+        lanciaDadoButton.setEnabled(false);
+        Timer timer = new Timer(500, null);
+        final int[] currentStep = {0};
+
+        timer.addActionListener(e -> {
+            if (currentStep[0] < posizioni.size()) {
+                spostaGiocatore( posizioni.get(currentStep[0]));
+                currentStep[0]++;
+            } else {
+                timer.stop();
+                log.info("mi sto fermando");
+                mediator.notifyPlayerStop();
+            }
+        });
+        timer.start();
+
+    }
+
+    @Override
+    public void mostraVincitore() {
+        int option = JOptionPane.showOptionDialog(panel,
+                "Hai vinto: " + giocatoreCurr.getGiocatore().getNome(),
+                "Lancio",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                new Object[]{"OK"},
+                "OK");
+        //notifica su ok
+        if (option == 0) {
+
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 }

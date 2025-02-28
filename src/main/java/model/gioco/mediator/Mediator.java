@@ -1,11 +1,8 @@
 package model.gioco.mediator;
 
-
-import model.giocatore.Giocatore;
 import model.gioco.GiocoModel;
 import view.interfacce.schermata.SchermataGioco;
 
-import java.util.List;
 
 public interface Mediator {
 

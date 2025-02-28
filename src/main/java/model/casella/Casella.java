@@ -3,7 +3,9 @@ package model.casella;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.nio.Buffer;
 
 @Getter
 @Setter
@@ -29,8 +31,8 @@ public class Casella implements Serializable {
     public double getAltezza(){
         return casellaFlyweight.getAltezza();
     }
-    public String getImageURL(){
-        return casellaFlyweight.getImageURL();
+    public BufferedImage getImmagine(){
+        return casellaFlyweight.getImmagine();
     }
 
     public enum CasellaState{

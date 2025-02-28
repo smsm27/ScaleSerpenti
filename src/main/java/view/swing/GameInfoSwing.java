@@ -176,7 +176,7 @@ public class GameInfoSwing extends JPanel implements GiocoModel.GiocoListener {
     /**
      * Metodo per aggiornare la UI quando il modello cambia
      */
-    public void updateUI(GiocoModel.StatoTurno statoTurno) {
+    private void updateUI(GiocoModel.StatoTurno statoTurno) {
         // Aggiorna le informazioni del giocatore corrente
         setCurrentPlayerInfo(giocoModel.getGiocatoreCorrente());
 

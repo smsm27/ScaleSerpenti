@@ -1,30 +1,19 @@
 package view.swing;
 
 import controller.creazione.CreazioneTabellaController;
-import model.casella.Casella;
-import model.giocatore.Giocatore;
-import view.interfacce.schermata.AbstractSchermataSwing;
-import view.interfacce.schermata.Dialogo;
+
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+import view.astrazioni.schermata.AbstractSchermataSwing;
 import view.interfacce.schermata.SchermataCreazione;
-import view.swing.casellaView.CasellaGraficaSwing;
 import view.swing.elementoSpecialeView.ElementoGraficoSwingFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.util.List;
 
-
-public class SchermataCreazioneSwing extends AbstractSchermataSwing implements SchermataCreazione, Dialogo {
+@Log4j2
+public class SchermataCreazioneSwing extends AbstractSchermataSwing implements SchermataCreazione {
     private CreazioneTabellaController controller;
-
-    @Override
-    public void rimuoviElementoGrafico(int indice) {
-        //TODO
-    }
-
-    @Override
-    public void mostraGiocatori(List<Giocatore> giocatori) {}
 
     @Override
     public void inizializza() {
@@ -36,7 +25,6 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
 
     /**
      * Inizializzo menu:
-     * Gioca
      * addSerpente
      * addScala
      * salva
@@ -65,7 +53,7 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
         menu.add(caricaItem);
         menuBar.add(menu);
 
-        aggiungiMenuTornaMenu(menuBar);
+        aggiungiTornaMenu(menuBar);
 
         frame.setJMenuBar(menuBar);
 
@@ -95,34 +83,9 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
 
     @Override
     public void dialogCaricamento() {
-        File directory = new File("src/main/save");
-        if (!directory.exists() || !directory.isDirectory()) {
-            mostraMessaggio("Nessuna mappa salvata trovata!",
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
 
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".ser"));
-        if (files == null || files.length == 0) {
-            mostraMessaggio("Nessuna mappa salvata trovata!",
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
 
-        String[] mapNames = new String[files.length];
-        for (int i = 0; i < files.length; i++) {
-            mapNames[i] = files[i].getName().replace(".ser", "");
-        }
-
-        String scelta = (String) JOptionPane.showInputDialog(
-                frame,
-                "Seleziona una mappa da caricare:",
-                "Carica Mappa",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                mapNames,
-                mapNames[0]
-        );
+        String scelta = getNomeTabella();
 
         if (scelta != null) {
             controller.caricaTabella(scelta);
@@ -179,34 +142,22 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
     @Override
     public void dialogSetNewTabella() {
         // Mostra una finestra di dialogo per configurare la tabella
-        JTextField numeroCaselleField = new JTextField("10");
+        JTextField numeroCaselleField = new JTextField("100");
 
         JTextField dimXField = new JTextField("50");
         JTextField dimYField = new JTextField("50");
 
-        // Variabili per memorizzare i percorsi delle immagini
-        final String[] sfondoTabellone = {null};
+      // Variabili per memorizzare i percorsi delle immagini
+
         final String[] immagineCasella = {null};
 
-        // Pulsanti per scegliere le immagini
-        JButton sfondoButton = new JButton("Scegli immagine sfondo");
+       // Pulsanti per scegliere le immagini
+
         JButton casellaButton = new JButton("Scegli immagine casella");
 
         // Label per mostrare i percorsi selezionati
-        JLabel sfondoLabel = new JLabel("Nessuna immagine selezionata");
-        JLabel casellaLabel = new JLabel("Nessuna immagine selezionata");
 
-        // Configurazione dei listener per i pulsanti
-        sfondoButton.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-                    "Immagini", "jpg", "jpeg", "png", "gif"));
-            int result = fileChooser.showOpenDialog(frame);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                sfondoTabellone[0] = fileChooser.getSelectedFile().getPath();
-                sfondoLabel.setText(fileChooser.getSelectedFile().getName());
-            }
-        });
+        JLabel casellaLabel = new JLabel("Nessuna immagine selezionata");
 
         casellaButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -219,11 +170,6 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
             }
         });
 
-        // Pannelli per organizzare i componenti di selezione delle immagini
-        JPanel sfondoPanel = new JPanel(new BorderLayout());
-        sfondoPanel.add(sfondoButton, BorderLayout.WEST);
-        sfondoPanel.add(sfondoLabel, BorderLayout.CENTER);
-
         JPanel casellaPanel = new JPanel(new BorderLayout());
         casellaPanel.add(casellaButton, BorderLayout.WEST);
         casellaPanel.add(casellaLabel, BorderLayout.CENTER);
@@ -232,7 +178,6 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
                 "Numero di righe:", numeroCaselleField,
                 "Dimensione casella X:", dimXField,
                 "Dimensione casella Y:", dimYField,
-                "Sfondo Tabellone:", sfondoPanel,
                 "Immagine Casella:", casellaPanel
         };
 
@@ -248,8 +193,8 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
                 int numCaselle = Integer.parseInt(numeroCaselleField.getText());
                 int dimX = Integer.parseInt(dimXField.getText());
                 int dimY = Integer.parseInt(dimYField.getText());
-
-                controller.creaNuovaTabella(numCaselle,dimX,dimY,sfondoTabellone[0],immagineCasella[0]);
+                log.info(immagineCasella[0]);
+                controller.creaNuovaTabella(numCaselle,dimX,dimY,immagineCasella[0]);
 
             } catch (NumberFormatException ex) {
                 mostraMessaggio("Inserire valori validi!", "Errore", JOptionPane.ERROR_MESSAGE);
@@ -258,4 +203,11 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
         frame.setVisible(true);
 
     }
+
+    @Override
+    public void rimuoviElementoGrafico(int indice) {
+        //TODO
+    }
+
+
 }

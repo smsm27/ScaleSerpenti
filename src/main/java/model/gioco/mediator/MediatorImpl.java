@@ -4,7 +4,6 @@ package model.gioco.mediator;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
-import model.giocatore.Giocatore;
 import model.gioco.GiocoModel;
 import view.interfacce.schermata.SchermataGioco;
 
@@ -30,7 +29,7 @@ public class MediatorImpl implements Mediator {
         if( view == null || giocoModel == null)
             throw new NullPointerException();
 
-        view.mostraTabellaGrafica(giocoModel.getTabellaModel());
+        view.mostraTabella(giocoModel.getTabellaModel());
         view.mostraGiocatori(giocoModel.getGiocatori());
         view.setGiocatoreCorrente(giocoModel.getGiocatoreCorrente() );
 

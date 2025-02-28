@@ -1,27 +1,29 @@
-package view.interfacce.schermata;
+package view.astrazioni.schermata;
 
+import lombok.extern.log4j.Log4j2;
 import model.casella.Casella;
-import model.tabella.Tabella;
 import model.tabella.TabellaModel;
-import tools.Colori;
 import view.interfacce.elementoGrafico.ElementoGrafico;
+import view.interfacce.schermata.Schermata;
 import view.swing.SchermataInizialeSwing;
 import view.swing.casellaView.CasellaGraficaSwing;
 import view.swing.elementoSpecialeView.ElementoGraficoSwingFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 
-public abstract class AbstractSchermataSwing implements Schermata{
+@Log4j2
+public abstract class AbstractSchermataSwing implements Schermata {
     protected JFrame frame;
     protected JLayeredPane panel;
     protected List<CasellaGraficaSwing> caselleGrafiche = new ArrayList<>();
-    protected Map<Integer, ElementoGrafico> elementiSpeciali = new HashMap<>();
+    protected Map<Integer, ElementoGrafico> elementiGrafici = new HashMap<>();
     protected ElementoGraficoSwingFactory elementoGraficoSwingFactory = new ElementoGraficoSwingFactory();
 
-    protected void aggiungiMenuTornaMenu(JMenuBar menuBar) {
+    protected void aggiungiTornaMenu(JMenuBar menuBar) {
         JMenu menuFile = null;
 
         // Check if there's already a "File" menu
@@ -56,7 +58,7 @@ public abstract class AbstractSchermataSwing implements Schermata{
     }
 
     @Override
-    public void mostraTabellaGrafica(TabellaModel tabellaModel) {
+    public void mostraTabella(TabellaModel tabellaModel) {
         pulisciVista();
         Color[] colori={Color.yellow, Color.white, Color.darkGray, Color.blue};
         int i=0;
@@ -83,7 +85,7 @@ public abstract class AbstractSchermataSwing implements Schermata{
     public void mostraElementoGrafico(ElementoGrafico elemento) {
         if (elemento instanceof JComponent) {
             panel.add((JComponent)elemento, JLayeredPane.DRAG_LAYER);
-            elementiSpeciali.put(elemento.hashCode(), elemento);
+            elementiGrafici.put(elemento.hashCode(), elemento);
         }
     }
 
@@ -96,7 +98,7 @@ public abstract class AbstractSchermataSwing implements Schermata{
     public void pulisciVista() {
         panel.removeAll();
         caselleGrafiche.clear();
-        elementiSpeciali.clear();
+        elementiGrafici.clear();
     }
 
     @Override
@@ -105,6 +107,40 @@ public abstract class AbstractSchermataSwing implements Schermata{
         panel.repaint();
     }
 
+    @Override
+    public String getNomeTabella() {
+        String userHome = System.getProperty("user.home");
+        File directory = new File(userHome, "SerpiEScale/save");
+        if (!directory.exists() || !directory.isDirectory()) {
+            JOptionPane.showMessageDialog(frame, "Nessuna mappa salvata trovata!",
+                    "Errore", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
 
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(".ser"));
+        if (files == null || files.length == 0) {
+            JOptionPane.showMessageDialog(frame, "Nessuna mappa salvata trovata!",
+                    "Errore", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        String[] mapNames = new String[files.length];
+        for (int i = 0; i < files.length; i++) {
+            log.info(files[i].getName());
+            mapNames[i] = files[i].getName().replace(".ser", "");
+
+        }
+
+
+        return (String) JOptionPane.showInputDialog(
+                frame,
+                "Seleziona una mappa da caricare:",
+                "Carica Mappa",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                mapNames,
+                mapNames[0]
+        );
+    }
 
 }

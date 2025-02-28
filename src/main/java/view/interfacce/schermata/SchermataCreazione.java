@@ -1,8 +1,12 @@
 package view.interfacce.schermata;
 
-import view.interfacce.elementoGrafico.ElementoGrafico;
+
 
 public interface SchermataCreazione extends Schermata {
+    void dialogCaricamento();
+    void dialogSetNewTabella();
+    void dialogAddElementoSpeciale(String tipo);
+    void dialogGestisciSalvataggio();
     void rimuoviElementoGrafico(int indice);
     void pulisciVista();
 }

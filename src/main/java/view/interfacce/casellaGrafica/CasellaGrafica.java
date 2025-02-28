@@ -5,9 +5,9 @@ import model.casella.Casella;
 public interface CasellaGrafica {
 
     void setNumeroLabel();
-    void aggiungiDragListener();
+//    void aggiungiDragListener();
     Casella getCasella();
-    void setImmagine();
+//    void setImmagine();
     void update();
 
 }

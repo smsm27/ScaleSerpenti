@@ -4,7 +4,6 @@ import model.casella.Casella;
 import model.casella.CasellaFlyweight;
 import tools.SaveLoadTabella;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -157,8 +156,6 @@ public class TabellaModel {
         }
         return true;
     }
-
-
 
     /**
      * Converte una stringa nel corrispondente stato della casella
