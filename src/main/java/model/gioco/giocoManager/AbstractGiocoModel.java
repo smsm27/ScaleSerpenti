@@ -1,19 +1,18 @@
-package model.gioco;
+package model.gioco.giocoManager;
 
 import lombok.Getter;
 import lombok.Setter;
+import model.casella.Casella;
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
+import model.gioco.mediator.Mediator;
 import model.tabella.TabellaModel;
-import model.casella.Casella;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class GiocoModel {
-
-
+public abstract class AbstractGiocoModel {
 
     public enum StatoTurno {
         IN_ATTESA_LANCIO,   // In attesa che il giocatore lanci i dadi
@@ -29,17 +28,19 @@ public class GiocoModel {
     }
 
     @Getter
-    private List<Giocatore> giocatori;
+    protected List<Giocatore> giocatori;
     @Getter
     @Setter
-    private TabellaModel tabellaModel;
-    private int giocatoreCorrenteIndex;
-    private Random random;
+    protected TabellaModel tabellaModel;
+    protected int giocatoreCorrenteIndex;
+    protected Random random;
     @Getter
     @Setter
-    private StatoTurno statoTurno;
+    protected StatoTurno statoTurno;
     @Getter
-    int risultato;
+    protected int risultato;
+
+
 
     private List<GiocoListener> listeners = new ArrayList<>();
 
@@ -53,7 +54,7 @@ public class GiocoModel {
     }
 
     // Metodo per notificare i listeners
-    private void notifyListeners() {
+    protected void notifyListeners() {
         for (GiocoListener listener : listeners) {
             listener.onGiocoUpdated(statoTurno);
         }
@@ -64,7 +65,7 @@ public class GiocoModel {
         notifyListeners();
     }
 
-    public GiocoModel(String nomeMappa,List<Giocatore> giocatoriNonOrdinati) {
+    public AbstractGiocoModel(String nomeMappa, List<Giocatore> giocatoriNonOrdinati) {
         this.random = new Random();
         this.giocatoreCorrenteIndex = 0;
         this.tabellaModel = new TabellaModel();
@@ -82,49 +83,9 @@ public class GiocoModel {
         return giocatori.get(giocatoreCorrenteIndex);
     }
 
-    public int lanciaDado() {
-        setStatoTurno(StatoTurno.MOVIMENTO);
-        risultato = random.nextInt(6) + 1;
-        notifyListeners();
-        // Genera un numero casuale tra 1 e 6
-        return risultato;
-    }
+    public abstract int lanciaDado();
 
-    public List<Posizione> calcolaPercorso(int spostamento) {
-        List<Posizione> percorso = new ArrayList<>();
-        Giocatore giocatoreCorrente = getGiocatoreCorrente();
-        int indiceAttuale = giocatoreCorrente.getIndiceCurr();
-        int nuovoIndice = indiceAttuale + spostamento;
-
-        List<Casella> caselle = tabellaModel.getCaselle();
-
-        // Verifica che la nuova posizione non superi la fine della tabella
-        if (nuovoIndice >= caselle.size()) {
-            nuovoIndice = caselle.size() - 1;
-        }
-
-        // Genera il percorso della pedina
-        for (int i = indiceAttuale + 1; i <= nuovoIndice; i++) {
-            percorso.add(caselle.get(i).getPosizione());
-        }
-
-        // Gestione di eventuali scale o serpenti usando il TabellaModel
-        if (tabellaModel.isCasellaSpecialeComplessa(nuovoIndice)) {
-            setStatoTurno(StatoTurno.AZIONE_CASELLA);
-            Casella casellaDiArrivo = tabellaModel.getCasella(nuovoIndice);
-            Casella casellaDestinazione = casellaDiArrivo.getDestinazione();
-            int indiceFinaleCasella = caselle.indexOf(casellaDestinazione);
-
-            percorso.add(casellaDestinazione.getPosizione());
-            nuovoIndice = indiceFinaleCasella;
-        }
-
-        // Aggiorna la posizione del giocatore
-        giocatoreCorrente.setPosizione(tabellaModel.getCasella(nuovoIndice).getPosizione());
-        giocatoreCorrente.setIndiceCurr(nuovoIndice);
-
-        return percorso;
-    }
+    public abstract List<Posizione> calcolaPercorso(int spostamento);
 
     public boolean verificaVincitore() {
         Giocatore giocatoreCorrente = getGiocatoreCorrente();
@@ -159,6 +120,10 @@ public class GiocoModel {
             ordineGiocatori.set(j, temp);
         }
         return ordineGiocatori;
+    }
+
+    public StatoTurno getStato(){
+        return statoTurno;
     }
 
 }

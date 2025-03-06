@@ -24,8 +24,18 @@ public class CreazioneTabellaController {
         view.mostraTabella(tabella);
     }
 
-    public void aggiungiCasellaSpeciale(String tipo, int partenza, int destinazione) {
+    public void aggiungiCasellaSpeciale(String tipo, int partenza){
+        boolean risultato =tabella.aggiungiCasellaSpeciale(tipo,partenza);
+        if(risultato){
+            ElementoGrafico elemento = elementoGraficoFactory.creaElemento(tabella.getCasella(partenza));
+            view.mostraElementoGrafico(elemento);
+            view.refresh();
+        }else {
+            view.mostraMessaggio("Impossibile aggiungere casella speciale", "Errore", 0);
+        }
+    }
 
+    public void aggiungiCasellaSpeciale(String tipo, int partenza, int destinazione) {
         boolean risultato = tabella.aggiungiCasellaSpeciale(tipo, partenza, destinazione);
         if (risultato) {
             ElementoGrafico elemento = elementoGraficoFactory.creaElemento(

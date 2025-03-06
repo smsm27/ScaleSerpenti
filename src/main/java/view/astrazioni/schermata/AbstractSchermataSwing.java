@@ -23,6 +23,8 @@ public abstract class AbstractSchermataSwing implements Schermata {
     protected Map<Integer, ElementoGrafico> elementiGrafici = new HashMap<>();
     protected ElementoGraficoSwingFactory elementoGraficoSwingFactory = new ElementoGraficoSwingFactory();
 
+
+
     protected void aggiungiTornaMenu(JMenuBar menuBar) {
         JMenu menuFile = null;
 
@@ -71,10 +73,17 @@ public abstract class AbstractSchermataSwing implements Schermata {
         }
         for(Map.Entry<Integer, Casella> entry : tabellaModel.getOggettiSpeciali().entrySet()) {
             ElementoGrafico elementoGrafico = null;
-            if(tabellaModel.isCasellaSpecialeComplessa(entry.getKey())) {
+            if(tabellaModel.isCasellaComplessa(entry.getKey())) {
                 elementoGrafico = elementoGraficoSwingFactory.getElemento(
                         caselleGrafiche.get(entry.getKey()), caselleGrafiche.get(entry.getValue().getDestinazione().getIndice())
                 );
+            }else{
+                if(!tabellaModel.isPartOfCasellaComplessa(entry.getKey())) {
+                    elementoGrafico = elementoGraficoSwingFactory.getElemento(
+                            caselleGrafiche.get(entry.getKey()),null
+                    );
+                }
+
             }
             mostraElementoGrafico(elementoGrafico);
         }
@@ -96,9 +105,11 @@ public abstract class AbstractSchermataSwing implements Schermata {
 
 
     public void pulisciVista() {
-        panel.removeAll();
-        caselleGrafiche.clear();
-        elementiGrafici.clear();
+        if (panel != null) {
+            panel.removeAll();
+            caselleGrafiche.clear();
+            elementiGrafici.clear();
+        }
     }
 
     @Override
@@ -132,15 +143,28 @@ public abstract class AbstractSchermataSwing implements Schermata {
         }
 
 
-        return (String) JOptionPane.showInputDialog(
+        String res = (String) JOptionPane.showInputDialog(
                 frame,
                 "Seleziona una mappa da caricare:",
                 "Carica Mappa",
-                JOptionPane.QUESTION_MESSAGE,
+                JOptionPane.INFORMATION_MESSAGE,
                 null,
                 mapNames,
                 mapNames[0]
         );
+
+        return res;
+    }
+
+    public void gestisciErrore(){
+        // Mostra il messaggio di errore
+        JOptionPane.showMessageDialog(frame, "Mappa inesistente/ nessun giocatore inserito", "Errore", JOptionPane.ERROR_MESSAGE);
+
+        // Chiudi il frame corrente
+        frame.dispose();
+
+        // Mostra la schermata iniziale
+        SchermataInizialeSwing.getInstance().mostraMenu();
     }
 
 }

@@ -4,23 +4,23 @@ package view.swing;
 
 import lombok.extern.log4j.Log4j2;
 import model.giocatore.Giocatore;
-import model.gioco.GiocoModel;
+import model.gioco.giocoManager.AbstractGiocoModel;
+import model.gioco.giocoManager.GiocoBaseModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Log4j2
-public class GameInfoSwing extends JPanel implements GiocoModel.GiocoListener {
+public class GameInfoSwing extends JPanel implements GiocoBaseModel.GiocoListener {
     private JTextArea logArea;
     private JScrollPane scrollPane;
     private JLabel currentPlayerLabel;
     private JLabel playerPositionLabel;
     private JPanel allPlayersPanel;
     private List<JLabel> playerLabels;
-    private GiocoModel giocoModel;
+    private AbstractGiocoModel giocoModel;
 
     public GameInfoSwing() {
         setLayout(new BorderLayout(5, 5));
@@ -81,7 +81,7 @@ public class GameInfoSwing extends JPanel implements GiocoModel.GiocoListener {
      * Configura il pannello con il modello di gioco
      * @param giocoModel Il modello di gioco
      */
-    public void setGiocoModel(GiocoModel giocoModel) {
+    public void setGiocoModel(AbstractGiocoModel giocoModel) {
         this.giocoModel = giocoModel;
 
         // Aggiorna i label dei giocatori
@@ -176,7 +176,7 @@ public class GameInfoSwing extends JPanel implements GiocoModel.GiocoListener {
     /**
      * Metodo per aggiornare la UI quando il modello cambia
      */
-    private void updateUI(GiocoModel.StatoTurno statoTurno) {
+    private void updateUI(GiocoBaseModel.StatoTurno statoTurno) {
         // Aggiorna le informazioni del giocatore corrente
         setCurrentPlayerInfo(giocoModel.getGiocatoreCorrente());
 
@@ -206,7 +206,7 @@ public class GameInfoSwing extends JPanel implements GiocoModel.GiocoListener {
     }
 
     @Override
-    public void onGiocoUpdated(GiocoModel.StatoTurno statoTurno) {
+    public void onGiocoUpdated(GiocoBaseModel.StatoTurno statoTurno) {
         updateUI(statoTurno);
     }
 }

@@ -1,6 +1,7 @@
 package model.gioco.mediator;
 
-import model.gioco.GiocoModel;
+import model.gioco.giocoManager.AbstractGiocoModel;
+import model.gioco.giocoManager.GiocoBaseModel;
 import view.interfacce.schermata.SchermataGioco;
 
 
@@ -11,7 +12,8 @@ public interface Mediator {
     void notifyDiceRoll();
     void notifyPlayerMove( );
     void notifyTurnChange();
+    void verificaStatoGiocatore();
     void registerView(SchermataGioco view);
-    void registerGameManager(GiocoModel gameModel);
+    void registerGameManager(AbstractGiocoModel gameModel);
     void notifyPlayerStop();
 }

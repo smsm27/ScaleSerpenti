@@ -20,6 +20,16 @@ public class ElementoGraficoSwingFactory implements ElementoGraficoFactory {
         };
     }
 
+    @Override
+    public ElementoGrafico creaElemento(Casella partenza) {
+        CasellaGraficaSwing partenzaSwing = new CasellaGraficaSwing(partenza, Color.BLUE);
+        return switch (partenza.getCasellaState()){
+            case FINALE -> new FinaleSwing(partenzaSwing);
+            default -> throw new IllegalArgumentException("Tipo non supportato: " + partenza.getCasellaState());
+        };
+    }
+
+
     public ElementoGrafico getElemento( CasellaGraficaSwing partenzaSwing, CasellaGraficaSwing destinazioneSwing) {
         return switch (partenzaSwing.getCasella().getCasellaState()) {
             case SERPENTE -> new SerpenteSwing(partenzaSwing, destinazioneSwing);

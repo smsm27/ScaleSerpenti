@@ -4,7 +4,7 @@ package model.gioco.mediator;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
-import model.gioco.GiocoModel;
+import model.gioco.giocoManager.AbstractGiocoModel;
 import view.interfacce.schermata.SchermataGioco;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 public class MediatorImpl implements Mediator {
 
     private SchermataGioco view;
-    private GiocoModel giocoModel;
+    private AbstractGiocoModel giocoModel;
     @Getter
     private int risultato;
 
@@ -22,6 +22,12 @@ public class MediatorImpl implements Mediator {
      * start notificato da giocoModel dopo la creazione della tabella
      */
 
+    public void verificaStatoGiocatore(){
+        switch (giocoModel.getStatoTurno()){
+            case IN_ATTESA_LANCIO -> notifyDiceRoll();
+            case FINE_TURNO -> notifyPlayerStop();
+        }
+    }
 
 
     @Override
@@ -84,7 +90,7 @@ public class MediatorImpl implements Mediator {
     }
 
     @Override
-    public void registerGameManager(GiocoModel giocoModel) {
+    public void registerGameManager(AbstractGiocoModel giocoModel) {
         this.giocoModel= giocoModel;
 
 

@@ -1,7 +1,12 @@
 package view.swing;
 
+import model.tabella.TabellaModel;
+import view.interfacce.elementoGrafico.ElementoGrafico;
+import view.interfacce.schermata.Schermata;
+
 import javax.swing.*;
 import java.awt.*;
+
 
 public class SchermataInizialeSwing {
     private static SchermataInizialeSwing instance;
@@ -21,6 +26,8 @@ public class SchermataInizialeSwing {
         setupEventHandlers();
         frame.setVisible(true);
     }
+
+
 
     public void mostraMenu() {
         if (frame != null) {
@@ -63,7 +70,7 @@ public class SchermataInizialeSwing {
             if (component instanceof JButton button) {
                 switch (button.getText()) {
                     case "Crea Tabella" -> button.addActionListener(e -> avviaSchermataCreazione());
-                    case "Gioca" -> button.addActionListener(e -> avviaSchermataGioco());
+                    case "Gioca" -> button.addActionListener(e -> scegliModalitaGioco());
                     case "Esci" -> button.addActionListener(e -> System.exit(0));
                 }
             }
@@ -86,11 +93,37 @@ public class SchermataInizialeSwing {
         }
     }
 
-    private void avviaSchermataGioco() {
+    private void scegliModalitaGioco() {
+        Object[] options = {"Modalità Manuale", "Modalità Automatica"};
+        int scelta = JOptionPane.showOptionDialog(
+                frame,
+                "Scegli la modalità di gioco:",
+                "Modalità Gioco",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
         frame.dispose(); // Chiude la schermata corrente
 
-        SchermataGiocaSwing schermataGioco = new SchermataGiocaSwing();
-        schermataGioco.inizializza();
+        if (scelta == 0) {
+            // Modalità Manuale
+            avviaSchermataGiocoManuale();
+        } else {
+            // Modalità Automatica
+            avviaSchermataGiocoAutomatica();
+        }
+    }
+
+    private void avviaSchermataGiocoManuale() {
+        // Utilizziamo la factory per creare l'istanza di gioco in modalità manuale
+        SchermataGiocaFactory.createSchermataGioca(SchermataGiocaFactory.GameMode.MANUAL).inizializza();
+    }
+
+    private void avviaSchermataGiocoAutomatica() {
+        // Utilizziamo la factory per creare l'istanza di gioco in modalità automatica
+        SchermataGiocaFactory.createSchermataGioca(SchermataGiocaFactory.GameMode.AUTOMATIC).inizializza();
     }
 
     private boolean mostraDialogCreaOCarica() {

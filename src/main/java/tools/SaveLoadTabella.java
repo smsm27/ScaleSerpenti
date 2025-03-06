@@ -26,6 +26,7 @@ public class SaveLoadTabella {
 
             // Crea oggetto per salvare lo stato
             TabellaStato stato = new TabellaStato();
+            log.info("é vuota ?"+tabella.isEmpty());
             stato.setCaselle(tabella);
 
             // Salva su file
@@ -43,17 +44,22 @@ public class SaveLoadTabella {
 
     public static TabellaStatoCaricata caricaStato(String nomeFile) throws IOException, ClassNotFoundException {
         String userHome = System.getProperty("user.home");
-
+        File save = new File(userHome, "SerpiEScale/save/"+ nomeFile +".ser");
         try (ObjectInputStream in = new ObjectInputStream(
-                new FileInputStream(userHome + "/SerpiEScale/save/" + nomeFile + ".ser"))) {
+                new FileInputStream(save))) {
 
             tools.TabellaStato stato = (TabellaStato) in.readObject();
+            log.info("seivuoto? " +stato.getCaselle().isEmpty() + " primo elemnto: " + stato.getCaselle().getFirst().getIndice());
             List<Casella> caselle = stato.getCaselle();
-            stato.getCaselle().getFirst().getCasellaFlyweight().caricaImmagine();
+            if(stato.getCaselle().getFirst().getImmagine()!=null){
+                stato.getCaselle().getFirst().getCasellaFlyweight().caricaImmagine();
+            }
+
             Map<Integer, Casella> oggettiSpeciali = new HashMap<>();
 
             // Mappatura degli oggetti speciali
             for (Casella casella : caselle) {
+                log.info(casella.getPosizione().getX() + " " + casella.getPosizione().getY());
                 if (casella.getCasellaState() != Casella.CasellaState.NORMALE) {
                     if (casella.getCasellaState() == Casella.CasellaState.SCALA || casella.getCasellaState() == Casella.CasellaState.SERPENTE) {
                         if (casella.getDestinazione().getIndice() == null) {
@@ -68,7 +74,7 @@ public class SaveLoadTabella {
 
             return new TabellaStatoCaricata(caselle, oggettiSpeciali);
         } catch (Exception e){
-            log.error("{} percorso non ok", String.valueOf(e));
+            log.error( String.valueOf(e));
             return null;
         }
 

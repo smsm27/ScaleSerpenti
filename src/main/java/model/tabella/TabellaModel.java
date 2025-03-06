@@ -10,11 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 
-/**
- * Modello che gestisce i dati e la logica della tabella di gioco.
- * Parte del pattern MVP, contiene tutta la logica di business relativa
- * alla tabella e alle caselle.
- */
+
 public class TabellaModel {
     private List<Casella> caselle = new ArrayList<>();
     private Map<Integer, Casella> oggettiSpeciali = new HashMap<>();
@@ -33,7 +29,21 @@ public class TabellaModel {
 
         // Pulisce gli oggetti speciali
         oggettiSpeciali.clear();
+        oggettiSpeciali.put(caselle.getLast().getIndice(),caselle.getLast());
     }
+
+
+    public boolean aggiungiCasellaSpeciale(String tipo, int partenza){
+
+        // Verifica se esiste già una casella speciale in quella posizione
+        if (oggettiSpeciali.containsKey(partenza)) {
+            return false;
+        }
+        Casella casellaPartenza = caselle.get(partenza);
+        oggettiSpeciali.put(partenza, casellaPartenza);
+        return true;
+    }
+
 
     /**
      * Aggiunge una casella speciale (serpente o scala) alla tabella
@@ -104,12 +114,18 @@ public class TabellaModel {
     /**
      * Verifica se una casella è speciale e se è complesso (piu di una casella)
      */
-    public boolean isCasellaSpecialeComplessa(int indice) {
+    public boolean isCasellaComplessa(int indice) {
         if(isCasellaSpeciale(indice)){
             return oggettiSpeciali.get(indice).getDestinazione() != null;
         }
         return false;
 
+    }
+
+    public boolean isPartOfCasellaComplessa(int indice) {
+        Casella casella = oggettiSpeciali.get(indice);
+        return casella.getCasellaState() == Casella.CasellaState.FINE_SERPENTE ||
+                casella.getCasellaState() == Casella.CasellaState.FINE_SCALA;
     }
 
 

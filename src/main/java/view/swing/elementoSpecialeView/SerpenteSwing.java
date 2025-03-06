@@ -33,7 +33,7 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
     private BufferedImage codaColorata;
 
     // Proprietà per controllare l'aspetto del serpente
-    private final float spessoreCorpo = 5.0f;  // Ridotto a 5 pixel
+    private final float spessoreCorpo = 6.0f;  // Ridotto a 5 pixel
     private final float scalaTesta = 0.6f;    // Riduce la testa al 60%
     private final float scalaCoda = 0.6f;     // Riduce la coda al 60%
     private final float curvatura = 0.4f;     // Controlla quanto è curvo il serpente (0-1)
@@ -210,7 +210,7 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
         double ampiezza = lunghezza * curvatura * 0.8;
 
         // Frequenza - controlla quante "onde" ci sono
-        double frequenza = 1.0; // Un'onda completa
+        double frequenza = 1.5; // Un'onda completa
 
         // Array per memorizzare i punti del percorso
         Point2D.Double[] pathPoints = new Point2D.Double[segmenti + 1];
@@ -289,8 +289,6 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
             g2.setTransform(oldTransform);
         }
     }
-
-
 
     @Override
     public void disegna(Graphics g) {

@@ -13,6 +13,7 @@ import java.util.Objects;
 @Getter
 @Setter
 public class CasellaFlyweight implements Serializable {
+
     private double larghezza, altezza;
     private String imageURL;
     private transient BufferedImage immagine;

@@ -4,4 +4,5 @@ import model.casella.Casella;
 
 public interface ElementoGraficoFactory {
     ElementoGrafico creaElemento(Casella partenza, Casella destinazione);
+    ElementoGrafico creaElemento(Casella partenza);
 }
