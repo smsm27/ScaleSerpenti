@@ -1,11 +1,11 @@
-package view.swing;
+package view.swing.schermate.logPartita;
 
 
 
 import lombok.extern.log4j.Log4j2;
 import model.giocatore.Giocatore;
-import model.gioco.giocoManager.AbstractGiocoModel;
-import model.gioco.giocoManager.GiocoBaseModel;
+import model.gioco.AbstractGiocoModel;
+import model.gioco.GiocoBaseModel;
 
 import javax.swing.*;
 import java.awt.*;

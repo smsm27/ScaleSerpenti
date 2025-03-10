@@ -1,11 +1,10 @@
-package model.gioco.giocoManager;
+package model.gioco;
 
 import lombok.Getter;
 import lombok.Setter;
 import model.casella.Casella;
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
-import model.gioco.mediator.Mediator;
 import model.tabella.TabellaModel;
 
 import java.util.ArrayList;

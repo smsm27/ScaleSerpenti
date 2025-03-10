@@ -6,9 +6,8 @@ import model.casella.Casella;
 
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @Log4j2
 public class SaveLoadTabella {
@@ -42,37 +41,25 @@ public class SaveLoadTabella {
         }
     }
 
-    public static TabellaStatoCaricata caricaStato(String nomeFile) throws IOException, ClassNotFoundException {
+    public static TabellaStato caricaStato(String nomeFile) throws IOException, ClassNotFoundException {
         String userHome = System.getProperty("user.home");
         File save = new File(userHome, "SerpiEScale/save/"+ nomeFile +".ser");
         try (ObjectInputStream in = new ObjectInputStream(
                 new FileInputStream(save))) {
 
-            tools.TabellaStato stato = (TabellaStato) in.readObject();
+            TabellaStato stato = (TabellaStato) in.readObject();
             log.info("seivuoto? " +stato.getCaselle().isEmpty() + " primo elemnto: " + stato.getCaselle().getFirst().getIndice());
             List<Casella> caselle = stato.getCaselle();
             if(stato.getCaselle().getFirst().getImmagine()!=null){
                 stato.getCaselle().getFirst().getCasellaFlyweight().caricaImmagine();
             }
 
-            Map<Integer, Casella> oggettiSpeciali = new HashMap<>();
 
+            stato.ricostruisciOggettiSpeciali();
             // Mappatura degli oggetti speciali
-            for (Casella casella : caselle) {
-                log.info(casella.getPosizione().getX() + " " + casella.getPosizione().getY());
-                if (casella.getCasellaState() != Casella.CasellaState.NORMALE) {
-                    if (casella.getCasellaState() == Casella.CasellaState.SCALA || casella.getCasellaState() == Casella.CasellaState.SERPENTE) {
-                        if (casella.getDestinazione().getIndice() == null) {
-                            throw new IllegalStateException("Oggetto speciale senza destinazione");
-                        }
-                    }
-                    // Creare l'oggetto speciale appropriato basato sullo stato
-                    oggettiSpeciali.put(casella.getIndice(),
-                            casella);
-                }
-            }
 
-            return new TabellaStatoCaricata(caselle, oggettiSpeciali);
+
+            return stato;
         } catch (Exception e){
             log.error( String.valueOf(e));
             return null;

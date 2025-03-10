@@ -7,13 +7,13 @@ import view.swing.casellaView.CasellaGraficaSwing;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
+
 import java.awt.geom.AffineTransform;
-import java.awt.geom.CubicCurve2D;
+
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
@@ -37,6 +37,7 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
     private final float scalaTesta = 0.6f;    // Riduce la testa al 60%
     private final float scalaCoda = 0.6f;     // Riduce la coda al 60%
     private final float curvatura = 0.4f;     // Controlla quanto è curvo il serpente (0-1)
+    private final float ampiezzaMassima = 25.0f;
 
     // Colore del serpente
     private Color coloreSerpenteRandom;
@@ -53,7 +54,7 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
 
         caricaImmagine();
         aggiornaPosizione();
-        aggiungiListener();
+
     }
 
     /**
@@ -145,22 +146,7 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
         return colorata;
     }
 
-    @Override
-    public void aggiungiListener() {
-        partenza.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(java.awt.event.ComponentEvent e) {
-                aggiornaPosizione();
-            }
-        });
 
-        destinazione.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(java.awt.event.ComponentEvent e) {
-                aggiornaPosizione();
-            }
-        });
-    }
 
     @Override
     public void aggiornaPosizione() {
@@ -206,11 +192,18 @@ public class SerpenteSwing extends JPanel implements ElementoGrafico {
         // Numero di segmenti per la curva seno
         int segmenti = 30;
 
-        // Ampiezza della curva seno
-        double ampiezza = lunghezza * curvatura * 0.8;
+        // Calcola l'ampiezza con un limite massimo
+        // Utilizziamo una funzione che cresce all'inizio ma poi si stabilizza
+        double ampiezzaBase = lunghezza * curvatura * 0.3;  // Ridotta da 0.8 a 0.3 per diminuire l'effetto generale
+        double ampiezza = Math.min(ampiezzaBase, ampiezzaMassima);
 
         // Frequenza - controlla quante "onde" ci sono
-        double frequenza = 1.5; // Un'onda completa
+        // Aumentiamo la frequenza in base alla lunghezza per evitare onde troppo larghe
+        double frequenza = 1.5;
+        if (lunghezza > 200) {
+            // Aggiungi più onde per serpenti più lunghi
+            frequenza += (lunghezza - 200) / 200;
+        }
 
         // Array per memorizzare i punti del percorso
         Point2D.Double[] pathPoints = new Point2D.Double[segmenti + 1];

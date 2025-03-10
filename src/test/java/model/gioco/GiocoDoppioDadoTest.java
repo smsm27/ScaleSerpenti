@@ -1,7 +1,6 @@
-package model.gioco.giocoManager;
+package model.gioco;
 import model.giocatore.Giocatore;
-import model.gioco.giocoManager.AbstractGiocoModel.StatoTurno;
-import model.gioco.giocoManager.GiocoDoppioDado;
+import model.gioco.AbstractGiocoModel.StatoTurno;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

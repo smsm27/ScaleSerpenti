@@ -1,4 +1,4 @@
-package model.gioco.giocoManager;
+package model.gioco;
 
 import model.casella.Casella;
 import model.casella.Posizione;
@@ -19,8 +19,9 @@ public class GiocoDoppioDado extends AbstractGiocoModel{
         if(getStatoTurno()==StatoTurno.FINE_TURNO){
             return 0;
         }
-        setStatoTurno(StatoTurno.MOVIMENTO);
         risultato = random.nextInt(12) + 1;
+        setStatoTurno(StatoTurno.MOVIMENTO);
+        notifyListeners();
         if (risultato == 12){
             setStatoTurno(StatoTurno.IN_ATTESA_LANCIO);
         }else{

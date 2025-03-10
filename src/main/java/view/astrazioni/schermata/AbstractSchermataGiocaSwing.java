@@ -1,14 +1,15 @@
-package view.swing;
+package view.astrazioni.schermata;
 
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
-import model.gioco.giocoManager.AbstractGiocoModel;
-import model.gioco.giocoManager.GiocoDoppioDado;
-import model.gioco.mediator.Mediator;
-import model.gioco.mediator.MediatorImpl;
+import model.gioco.AbstractGiocoModel;
+import model.gioco.GiocoBaseModel;
+import model.gioco.GiocoDoppioDado;
+import controller.gioco.Mediator;
+import controller.gioco.MediatorImpl;
 import tools.Colori;
-import view.astrazioni.schermata.AbstractSchermataSwing;
 import view.interfacce.schermata.SchermataGioco;
+import view.swing.schermate.logPartita.GameInfoSwing;
 import view.swing.GiocatoreSwing.GiocatoreGraficaSwing;
 
 import javax.swing.*;
@@ -24,6 +25,63 @@ public abstract class AbstractSchermataGiocaSwing extends AbstractSchermataSwing
     protected Mediator mediator = new MediatorImpl();
     protected Map<Color, GiocatoreGraficaSwing> giocatoriGrafici = new HashMap<>();
     protected GiocatoreGraficaSwing giocatoreCurr;
+
+
+    @Override
+    public void inizializza() {
+        initComponents();
+
+        String nomeMappa = getNomeTabella();
+
+
+        if ( nomeMappa==null || nomeMappa.isEmpty()) {
+            gestisciErrore();
+            return;
+        }
+
+        List<Giocatore> giocatori = getInfoPlayers();
+
+        if( giocatori.isEmpty()) {
+            gestisciErrore();
+            return;
+        }
+
+        AbstractGiocoModel giocoModel =  selezioneModalitaGioco(nomeMappa, giocatori);
+
+        mediator.registerGameManager(giocoModel);
+        mediator.registerView(this);
+
+        gameInfoPanel.setGiocoModel(giocoModel);
+        giocoModel.addListener(gameInfoPanel);
+
+        // Hook for mode-specific initialization
+        initModeSpecific(giocoModel);
+
+        mediator.start();
+    }
+
+    protected void initComponents() {
+        frame = new JFrame("Serpi e Scale");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 800);
+        colori = new Colori();
+        JMenuBar menuBar = new JMenuBar();
+        aggiungiTornaMenu(menuBar);
+        frame.setJMenuBar(menuBar);
+
+        // Create main panel
+        panel = new JLayeredPane();
+        frame.add(panel, BorderLayout.CENTER);
+
+        // Create panels
+        JPanel buttonPanel = createButtonPanel();
+        gameInfoPanel = new GameInfoSwing();
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+        frame.add(gameInfoPanel, BorderLayout.NORTH);
+
+        frame.add(panel);
+        frame.setVisible(true);
+    }
 
 
     @Override
@@ -66,6 +124,7 @@ public abstract class AbstractSchermataGiocaSwing extends AbstractSchermataSwing
                         JOptionPane.showMessageDialog(frame, "Devi inserire almeno un giocatore.", "Attenzione", JOptionPane.WARNING_MESSAGE);
                         // Continua il ciclo per chiedere di nuovo
                     }
+
                 }
             }
             return giocatori;
@@ -143,67 +202,36 @@ public abstract class AbstractSchermataGiocaSwing extends AbstractSchermataSwing
     @Override
     public abstract void animaMossa(List<Posizione> posizioniIntermedie);
 
+    protected AbstractGiocoModel selezioneModalitaGioco(String nomeMappa, List<Giocatore> giocatori) {
+        String[] opzioni = {"Gioco Base (Dado a 6 facce)", "Gioco Doppio Dado (Dado a 12 facce)"};
+
+        int scelta = JOptionPane.showOptionDialog(
+                frame,
+                "Seleziona la modalità di gioco:",
+                "Modalità di Gioco",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opzioni,
+                opzioni[0]
+        );
+
+        // Crea il modello di gioco in base alla scelta
+        AbstractGiocoModel giocoModel;
+        if (scelta == 1) {
+            giocoModel = new GiocoDoppioDado(nomeMappa, giocatori);
+        } else {
+            // Di default o se selezionato esplicitamente, usa il gioco base
+            giocoModel = new GiocoBaseModel(nomeMappa, giocatori);
+        }
+
+        return giocoModel;
+    }
 
     @Override
     public abstract void mostraVincitore();
 
 
-
-    @Override
-    public void inizializza() {
-        initComponents();
-
-        String nomeMappa = getNomeTabella();
-
-
-        if ( nomeMappa==null || nomeMappa.isEmpty()) {
-            gestisciErrore();
-            return;
-        }
-
-        List<Giocatore> giocatori = getInfoPlayers();
-
-        if( giocatori.isEmpty()) {
-            gestisciErrore();
-            return;
-        }
-
-        AbstractGiocoModel giocoModel = new GiocoDoppioDado(nomeMappa, giocatori);
-
-        mediator.registerGameManager(giocoModel);
-        mediator.registerView(this);
-
-        gameInfoPanel.setGiocoModel(giocoModel);
-        giocoModel.addListener(gameInfoPanel);
-
-        // Hook for mode-specific initialization
-        initModeSpecific(giocoModel);
-
-        mediator.start();
-    }
-
-    protected void initComponents() {
-        frame = new JFrame("Serpi e Scale");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
-        colori = new Colori();
-        JMenuBar menuBar = new JMenuBar();
-        aggiungiTornaMenu(menuBar);
-        frame.setJMenuBar(menuBar);
-
-        // Create main panel
-        panel = new JLayeredPane();
-        frame.add(panel, BorderLayout.CENTER);
-
-        // Create panels
-        JPanel buttonPanel = createButtonPanel();
-        gameInfoPanel = new GameInfoSwing();
-        frame.add(buttonPanel, BorderLayout.SOUTH);
-        frame.add(gameInfoPanel, BorderLayout.NORTH);
-
-        frame.add(panel);
-        frame.setVisible(true);
-    }
 
     protected abstract JPanel createButtonPanel();
 

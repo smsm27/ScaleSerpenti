@@ -5,7 +5,7 @@ import model.casella.Casella;
 import model.tabella.TabellaModel;
 import view.interfacce.elementoGrafico.ElementoGrafico;
 import view.interfacce.schermata.Schermata;
-import view.swing.SchermataInizialeSwing;
+import view.swing.schermate.inziale.SchermataInizialeSwing;
 import view.swing.casellaView.CasellaGraficaSwing;
 import view.swing.elementoSpecialeView.ElementoGraficoSwingFactory;
 
@@ -79,6 +79,7 @@ public abstract class AbstractSchermataSwing implements Schermata {
                 );
             }else{
                 if(!tabellaModel.isPartOfCasellaComplessa(entry.getKey())) {
+                    log.info("sono casella speciale non complessa "+ entry.getKey()+" "+ entry.getValue().getCasellaState());
                     elementoGrafico = elementoGraficoSwingFactory.getElemento(
                             caselleGrafiche.get(entry.getKey()),null
                     );

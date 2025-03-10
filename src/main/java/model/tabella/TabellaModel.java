@@ -3,6 +3,7 @@ package model.tabella;
 import model.casella.Casella;
 import model.casella.CasellaFlyweight;
 import tools.SaveLoadTabella;
+import tools.TabellaStato;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,13 +93,23 @@ public class TabellaModel {
     /**
      * Carica una tabella da file
      * @return true se il caricamento ha avuto successo
+
+     * Utilizzare SaveLoadTabella mi garandisce:
+     *      - L'utilizzo di TabellaStato che garantisce:
+     *         - Il caricamento OggettiSpeciali con distinzione tra oggetti Complessi(occupano 2 caselle(Scale/Serpenti)) e Speciali (occupano 1 casella(finale))
+     *      - il caricamento di singola immagine casella in memoria, riferimento per tutte le caselle
+     *
      */
     public boolean caricaTabella(String nomeFile) {
         try {
-            var stato = SaveLoadTabella.caricaStato(nomeFile);
-            caselle = stato.getCaselle();
-            oggettiSpeciali = stato.getOggettiSpeciali();
-            return true;
+            TabellaStato stato = SaveLoadTabella.caricaStato(nomeFile);
+            if (stato != null) {
+                caselle = stato.getCaselle();
+                oggettiSpeciali = stato.getOggettiSpeciali();
+                return true;
+            }
+            return false;
+
         } catch (Exception e) {
             return false;
         }

@@ -1,9 +1,8 @@
-package view.swing;
+package view.swing.schermate.creazione;
 
 import controller.creazione.CreazioneTabellaController;
 
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import view.astrazioni.schermata.AbstractSchermataSwing;
 import view.interfacce.schermata.SchermataCreazione;
 import view.swing.elementoSpecialeView.ElementoGraficoSwingFactory;
@@ -175,7 +174,7 @@ public class SchermataCreazioneSwing extends AbstractSchermataSwing implements S
         casellaPanel.add(casellaLabel, BorderLayout.CENTER);
 
         Object[] messaggio = {
-                "Numero di righe:", numeroCaselleField,
+                "Numero di caselle:", numeroCaselleField,
                 "Dimensione casella X:", dimXField,
                 "Dimensione casella Y:", dimYField,
                 "Immagine Casella:", casellaPanel

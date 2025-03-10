@@ -68,11 +68,6 @@ public class GiocatoreGraficaSwing extends JPanel implements GiocatoreGrafico {
     }
 
     @Override
-    public void aggiungiListener() {
-
-    }
-
-    @Override
     public void aggiornaPosizione() {
 
     }

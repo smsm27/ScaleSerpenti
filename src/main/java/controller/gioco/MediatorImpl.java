@@ -1,10 +1,10 @@
-package model.gioco.mediator;
+package controller.gioco;
 
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
-import model.gioco.giocoManager.AbstractGiocoModel;
+import model.gioco.AbstractGiocoModel;
 import view.interfacce.schermata.SchermataGioco;
 
 import java.util.List;

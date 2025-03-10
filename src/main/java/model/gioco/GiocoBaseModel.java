@@ -1,4 +1,4 @@
-package model.gioco.giocoManager;
+package model.gioco;
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
 import model.casella.Casella;
@@ -16,6 +16,7 @@ public class GiocoBaseModel extends AbstractGiocoModel {
         risultato = random.nextInt(6) + 1;
         notifyListeners();
         // Genera un numero casuale tra 1 e 6
+        setStatoTurno(StatoTurno.FINE_TURNO);
         return risultato;
     }
 

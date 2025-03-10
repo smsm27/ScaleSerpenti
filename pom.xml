@@ -52,7 +52,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>view.swing.SchermataInizialeSwing</mainClass>
+                            <mainClass>view.swing.schermate.inziale.SchermataInizialeSwing</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

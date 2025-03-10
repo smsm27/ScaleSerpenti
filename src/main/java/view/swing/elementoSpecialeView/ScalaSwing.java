@@ -32,7 +32,7 @@ public class ScalaSwing extends JPanel implements ElementoGrafico {
 
         caricaImmagine();
         aggiornaPosizione();
-        aggiungiListener();
+
     }
 
     @Override
@@ -50,22 +50,7 @@ public class ScalaSwing extends JPanel implements ElementoGrafico {
         }
     }
 
-    @Override
-    public void aggiungiListener() {
-        partenza.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(java.awt.event.ComponentEvent e) {
-                aggiornaPosizione();
-            }
-        });
 
-        destinazione.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(java.awt.event.ComponentEvent e) {
-                aggiornaPosizione();
-            }
-        });
-    }
 
     @Override
     public void aggiornaPosizione() {

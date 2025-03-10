@@ -1,4 +1,4 @@
-package view.swing;
+package view.swing.schermate.gioco;
 
 import view.interfacce.schermata.Schermata;
 
@@ -8,7 +8,6 @@ public class SchermataGiocaFactory {
         public enum GameMode {
             MANUAL,
             AUTOMATIC,
-            START
         }
 
         public static Schermata createSchermataGioca(GameMode mode) {

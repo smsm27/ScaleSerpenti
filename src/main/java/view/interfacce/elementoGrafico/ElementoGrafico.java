@@ -1,11 +1,10 @@
 package view.interfacce.elementoGrafico;
 
 import java.awt.*;
+import java.io.IOException;
 
 public interface ElementoGrafico {
     void disegna(Graphics g);
-    Rectangle getBounds();
-    void caricaImmagine();
-    void aggiungiListener();
+    void caricaImmagine() throws IOException;
     void aggiornaPosizione();
 }

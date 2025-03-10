@@ -1,8 +1,9 @@
-package view.swing;
+package view.swing.schermate.gioco;
 
 import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
-import model.gioco.giocoManager.AbstractGiocoModel;
+import model.gioco.AbstractGiocoModel;
+import view.astrazioni.schermata.AbstractSchermataGiocaSwing;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,24 +17,28 @@ public class SchermataGiocaAutomaticoSwing extends AbstractSchermataGiocaSwing {
 
     private boolean isPaused = false;
 
-
-
     @Override
     protected void handleGiocatoreCambio() {
+        if(!startButton.isEnabled()){
         String message = "Turno Giocatore: " + this.giocatoreCurr.getGiocatore().getNome();
 
-        JOptionPane pane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
-        JDialog dialog = pane.createDialog(panel, "Cambio turno");
-        dialog.setModal(false);
+        // Creo un JDialog personalizzato senza bottoni
+        JDialog dialog = new JDialog((Frame)SwingUtilities.getWindowAncestor(panel), "Cambio turno", false);
+        JLabel label = new JLabel(message, JLabel.CENTER);
+        label.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        dialog.add(label);
+        dialog.pack();
+        dialog.setLocationRelativeTo(panel);
 
         Timer timer = new Timer(2000, e -> {
             dialog.dispose();
+            refresh();
             mediator.notifyDiceRoll(); // Chiama il mediator dopo la chiusura del dialogo
         });
         timer.setRepeats(false);
         timer.start();
 
-        dialog.setVisible(true);
+        dialog.setVisible(true);}
     }
 
     @Override
@@ -45,13 +50,17 @@ public class SchermataGiocaAutomaticoSwing extends AbstractSchermataGiocaSwing {
                 "Hai fatto: " + risultato;
 
         // Mostro il dialogo in modo non bloccante
-        JOptionPane pane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE);
-        JDialog dialog = pane.createDialog(panel, "Risultato dado");
-        dialog.setModal(false); // Non bloccante
+        JDialog dialog = new JDialog((Frame)SwingUtilities.getWindowAncestor(panel), "Risultato dado", false);
+        JLabel label = new JLabel("<html>" + message.replace("\n", "<br>") + "</html>", JLabel.CENTER);
+        label.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        dialog.add(label);
+        dialog.pack();
+        dialog.setLocationRelativeTo(panel);
 
         // Timer per chiudere automaticamente il dialogo
         Timer timer = new Timer(3000, e -> {
             dialog.dispose();
+            refresh();
             mediator.notifyPlayerMove(); // Chiama il mediator dopo che il dialogo si chiude
         });
         timer.setRepeats(false);
@@ -105,8 +114,8 @@ public class SchermataGiocaAutomaticoSwing extends AbstractSchermataGiocaSwing {
         startButton = new JButton("Avvia Partita");
         startButton.addActionListener(e -> {
             isPaused = false;
-            handleGiocatoreCambio();
             startButton.setEnabled(false);
+            handleGiocatoreCambio();
             pauseButton.setEnabled(true);
         });
 
@@ -117,10 +126,9 @@ public class SchermataGiocaAutomaticoSwing extends AbstractSchermataGiocaSwing {
             if (isPaused) {
                 isPaused = false;
                 pauseButton.setText("Pausa");
-            } else {
-                isPaused = true;
-                pauseButton.setText("Riprendi");
             }
+            pauseButton.setEnabled(false);
+            startButton.setEnabled(true);
         });
 
         buttonPanel.add(startButton);
@@ -130,10 +138,5 @@ public class SchermataGiocaAutomaticoSwing extends AbstractSchermataGiocaSwing {
     }
 
     @Override
-    protected void initModeSpecific(AbstractGiocoModel giocoModel) {
-        if (mediator != null && giocatoreCurr != null && !isPaused) {
-                mediator.notifyDiceRoll();
-        }
-
-    }
+    protected void initModeSpecific(AbstractGiocoModel giocoModel) {}
 }

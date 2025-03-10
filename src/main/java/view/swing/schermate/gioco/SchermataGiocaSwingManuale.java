@@ -1,9 +1,10 @@
-package view.swing;
+package view.swing.schermate.gioco;
 
 
 import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
-import model.gioco.giocoManager.AbstractGiocoModel;
+import model.gioco.AbstractGiocoModel;
+import view.astrazioni.schermata.AbstractSchermataGiocaSwing;
 import view.interfacce.schermata.SchermataGioco;
 
 

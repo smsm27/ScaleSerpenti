@@ -1,7 +1,6 @@
-package model.gioco.mediator;
+package controller.gioco;
 
-import model.gioco.giocoManager.AbstractGiocoModel;
-import model.gioco.giocoManager.GiocoBaseModel;
+import model.gioco.AbstractGiocoModel;
 import view.interfacce.schermata.SchermataGioco;
 
 

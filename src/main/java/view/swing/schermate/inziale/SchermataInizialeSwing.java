@@ -1,8 +1,7 @@
-package view.swing;
+package view.swing.schermate.inziale;
 
-import model.tabella.TabellaModel;
-import view.interfacce.elementoGrafico.ElementoGrafico;
-import view.interfacce.schermata.Schermata;
+import view.swing.schermate.creazione.SchermataCreazioneSwing;
+import view.swing.schermate.gioco.SchermataGiocaFactory;
 
 import javax.swing.*;
 import java.awt.*;
