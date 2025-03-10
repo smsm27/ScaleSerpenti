@@ -4,7 +4,7 @@ package view.swing.schermate.gioco;
 import lombok.extern.log4j.Log4j2;
 import model.casella.Posizione;
 import model.gioco.AbstractGiocoModel;
-import view.astrazioni.schermata.AbstractSchermataGiocaSwing;
+import view.swing.schermate.astrazioni.AbstractSchermataGiocaSwing;
 import view.interfacce.schermata.SchermataGioco;
 
 

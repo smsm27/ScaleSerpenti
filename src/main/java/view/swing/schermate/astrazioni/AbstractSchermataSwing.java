@@ -1,4 +1,4 @@
-package view.astrazioni.schermata;
+package view.swing.schermate.astrazioni;
 
 import lombok.extern.log4j.Log4j2;
 import model.casella.Casella;
@@ -71,7 +71,7 @@ public abstract class AbstractSchermataSwing implements Schermata {
             panel.add(casellaGrafica, JLayeredPane.DEFAULT_LAYER);
 
         }
-        for(Map.Entry<Integer, Casella> entry : tabellaModel.getOggettiSpeciali().entrySet()) {
+        for(Map.Entry<Integer, Casella> entry : tabellaModel.getCaselleSpeciali().entrySet()) {
             ElementoGrafico elementoGrafico = null;
             if(tabellaModel.isCasellaComplessa(entry.getKey())) {
                 elementoGrafico = elementoGraficoSwingFactory.getElemento(

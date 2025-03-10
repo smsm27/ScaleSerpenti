@@ -14,34 +14,33 @@ import java.util.Map;
 
 public class TabellaModel {
     private List<Casella> caselle = new ArrayList<>();
-    private Map<Integer, Casella> oggettiSpeciali = new HashMap<>();
-    private CasellaFlyweight casellaFlyweight;
+    private Map<Integer, Casella> caselleSpeciali = new HashMap<>();
 
     /**
      * Crea una nuova tabella con le dimensioni e caratteristiche specificate
      */
     public void creaNuovaTabella(int dimensione, int dimX, int dimY, String immagineCasella) {
         // Crea il flyweight per le caselle
-        casellaFlyweight = new CasellaFlyweight(dimX, dimY, immagineCasella);
+        CasellaFlyweight casellaFlyweight = new CasellaFlyweight(dimX, dimY, immagineCasella);
 
         // Usa TabellaFactory per creare il tabellone
         TabellaFactory factory = new TabellaFactory(casellaFlyweight);
         caselle = factory.creaTabellone(dimensione);
 
         // Pulisce gli oggetti speciali
-        oggettiSpeciali.clear();
-        oggettiSpeciali.put(caselle.getLast().getIndice(),caselle.getLast());
+        caselleSpeciali.clear();
+        caselleSpeciali.put(caselle.getLast().getIndice(),caselle.getLast());
     }
 
 
     public boolean aggiungiCasellaSpeciale(String tipo, int partenza){
 
         // Verifica se esiste già una casella speciale in quella posizione
-        if (oggettiSpeciali.containsKey(partenza)) {
+        if (caselleSpeciali.containsKey(partenza)) {
             return false;
         }
         Casella casellaPartenza = caselle.get(partenza);
-        oggettiSpeciali.put(partenza, casellaPartenza);
+        caselleSpeciali.put(partenza, casellaPartenza);
         return true;
     }
 
@@ -57,7 +56,7 @@ public class TabellaModel {
         }
 
         // Verifica se esiste già una casella speciale in quella posizione
-        if (oggettiSpeciali.containsKey(partenza)) {
+        if (caselleSpeciali.containsKey(partenza)) {
             return false;
         }
 
@@ -72,12 +71,12 @@ public class TabellaModel {
 
         // Imposta lo stato delle caselle
         casellaPartenza.setDestinazione(casellaDestinazione);
-        casellaPartenza.setCasellaState(getTipoStateComplesso(tipo));
-        casellaDestinazione.setCasellaState(getTipoStateComplesso("fine_" + tipo));
+        casellaPartenza.setCasellaState(getTipoCasella(tipo));
+        casellaDestinazione.setCasellaState(getTipoCasella("fine_" + tipo));
 
         // Registra le caselle speciali
-        oggettiSpeciali.put(partenza, casellaPartenza);
-        oggettiSpeciali.put(destinazione, casellaDestinazione);
+        caselleSpeciali.put(partenza, casellaPartenza);
+        caselleSpeciali.put(destinazione, casellaDestinazione);
 
         return true;
     }
@@ -105,7 +104,7 @@ public class TabellaModel {
             TabellaStato stato = SaveLoadTabella.caricaStato(nomeFile);
             if (stato != null) {
                 caselle = stato.getCaselle();
-                oggettiSpeciali = stato.getOggettiSpeciali();
+                caselleSpeciali = stato.getOggettiSpeciali();
                 return true;
             }
             return false;
@@ -119,22 +118,22 @@ public class TabellaModel {
      * Verifica se una casella è speciale
      */
     public boolean isCasellaSpeciale(int indice) {
-        return oggettiSpeciali.containsKey(indice);
+        return caselleSpeciali.containsKey(indice);
     }
 
     /**
-     * Verifica se una casella è speciale e se è complesso (piu di una casella)
+     * Verifica se una casella è speciale e se è complessa (piu di una casella)
      */
     public boolean isCasellaComplessa(int indice) {
         if(isCasellaSpeciale(indice)){
-            return oggettiSpeciali.get(indice).getDestinazione() != null;
+            return caselleSpeciali.get(indice).getDestinazione() != null;
         }
         return false;
 
     }
 
     public boolean isPartOfCasellaComplessa(int indice) {
-        Casella casella = oggettiSpeciali.get(indice);
+        Casella casella = caselleSpeciali.get(indice);
         return casella.getCasellaState() == Casella.CasellaState.FINE_SERPENTE ||
                 casella.getCasellaState() == Casella.CasellaState.FINE_SCALA;
     }
@@ -160,8 +159,8 @@ public class TabellaModel {
     /**
      * Ottiene tutte le caselle speciali
      */
-    public Map<Integer, Casella> getOggettiSpeciali() {
-        return new HashMap<>(oggettiSpeciali);
+    public Map<Integer, Casella> getCaselleSpeciali() {
+        return new HashMap<>(caselleSpeciali);
     }
 
     /**
@@ -187,7 +186,7 @@ public class TabellaModel {
     /**
      * Converte una stringa nel corrispondente stato della casella
      */
-    private Casella.CasellaState getTipoStateComplesso(String tipo) {
+    private Casella.CasellaState getTipoCasella(String tipo) {
         return switch (tipo.toLowerCase()) {
             case "serpente" -> Casella.CasellaState.SERPENTE;
             case "scala" -> Casella.CasellaState.SCALA;

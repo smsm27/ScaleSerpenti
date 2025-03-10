@@ -41,7 +41,7 @@ public class SaveLoadTabella {
         }
     }
 
-    public static TabellaStato caricaStato(String nomeFile) throws IOException, ClassNotFoundException {
+    public static TabellaStato caricaStato(String nomeFile) {
         String userHome = System.getProperty("user.home");
         File save = new File(userHome, "SerpiEScale/save/"+ nomeFile +".ser");
         try (ObjectInputStream in = new ObjectInputStream(

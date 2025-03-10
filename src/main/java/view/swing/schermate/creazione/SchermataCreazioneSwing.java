@@ -3,7 +3,7 @@ package view.swing.schermate.creazione;
 import controller.creazione.CreazioneTabellaController;
 
 import lombok.extern.log4j.Log4j2;
-import view.astrazioni.schermata.AbstractSchermataSwing;
+import view.swing.schermate.astrazioni.AbstractSchermataSwing;
 import view.interfacce.schermata.SchermataCreazione;
 import view.swing.elementoSpecialeView.ElementoGraficoSwingFactory;
 

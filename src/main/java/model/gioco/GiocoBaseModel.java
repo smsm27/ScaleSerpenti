@@ -27,15 +27,31 @@ public class GiocoBaseModel extends AbstractGiocoModel {
         int nuovoIndice = indiceAttuale + spostamento;
 
         List<Casella> caselle = tabellaModel.getCaselle();
+        int indiceFine = caselle.size() - 1;
 
-        // Verifica che la nuova posizione non superi la fine della tabella
-        if (nuovoIndice >= caselle.size()) {
-            nuovoIndice = caselle.size() - 1;
+        // Gestione del superamento della fine
+        if (nuovoIndice > indiceFine) {
+            // Calcola la quantità di caselle in eccesso
+            int eccesso = nuovoIndice - indiceFine;
+            // La nuova posizione sarà: fine - eccesso
+            nuovoIndice = indiceFine - eccesso;
         }
 
         // Genera il percorso della pedina
-        for (int i = indiceAttuale + 1; i <= nuovoIndice; i++) {
-            percorso.add(caselle.get(i).getPosizione());
+        if (indiceAttuale < nuovoIndice) {
+            // Movimento in avanti
+            for (int i = indiceAttuale + 1; i <= nuovoIndice; i++) {
+                percorso.add(caselle.get(i).getPosizione());
+            }
+        } else if (indiceAttuale > nuovoIndice) {
+            // Prima avanza fino alla fine
+            for (int i = indiceAttuale + 1; i <= indiceFine; i++) {
+                percorso.add(caselle.get(i).getPosizione());
+            }
+            // Poi retrocede
+            for (int i = indiceFine - 1; i >= nuovoIndice; i--) {
+                percorso.add(caselle.get(i).getPosizione());
+            }
         }
 
         // Gestione di eventuali scale o serpenti usando il TabellaModel

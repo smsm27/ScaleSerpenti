@@ -1,4 +1,4 @@
-package view.astrazioni.schermata;
+package view.swing.schermate.astrazioni;
 
 import model.casella.Posizione;
 import model.giocatore.Giocatore;
