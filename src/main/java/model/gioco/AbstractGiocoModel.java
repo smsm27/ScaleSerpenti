@@ -23,7 +23,7 @@ public abstract class AbstractGiocoModel {
 
     // Interfaccia per i listeners
     public interface GiocoListener {
-        void onGiocoUpdated(StatoTurno statoTurno);
+        void onGiocoUpdated();
     }
 
     @Getter
@@ -55,7 +55,7 @@ public abstract class AbstractGiocoModel {
     // Metodo per notificare i listeners
     protected void notifyListeners() {
         for (GiocoListener listener : listeners) {
-            listener.onGiocoUpdated(statoTurno);
+            listener.onGiocoUpdated();
         }
     }
 

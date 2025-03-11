@@ -3,6 +3,7 @@ package view.swing.schermate.astrazioni;
 import lombok.extern.log4j.Log4j2;
 import model.casella.Casella;
 import model.tabella.TabellaModel;
+import tools.SaveLoadTabella;
 import view.interfacce.elementoGrafico.ElementoGrafico;
 import view.interfacce.schermata.Schermata;
 import view.swing.schermate.inziale.SchermataInizialeSwing;
@@ -62,11 +63,12 @@ public abstract class AbstractSchermataSwing implements Schermata {
     @Override
     public void mostraTabella(TabellaModel tabellaModel) {
         pulisciVista();
-        Color[] colori={Color.yellow, Color.white, Color.darkGray, Color.blue};
+        Color[] colori={Color.lightGray, Color.white, Color.red, Color.blue};
         int i=0;
         for (Casella casella : tabellaModel.getCaselle()) {
-            i= new Random().nextInt(colori.length);
-            CasellaGraficaSwing casellaGrafica = new CasellaGraficaSwing(casella, colori[1]);
+            //i= new Random().nextInt(colori.length);
+            //i=(i+1)%(colori.length);
+            CasellaGraficaSwing casellaGrafica = new CasellaGraficaSwing(casella, colori[0]);
             caselleGrafiche.add(casellaGrafica);
             panel.add(casellaGrafica, JLayeredPane.DEFAULT_LAYER);
 
@@ -104,7 +106,6 @@ public abstract class AbstractSchermataSwing implements Schermata {
         JOptionPane.showMessageDialog(frame, messaggio, titolo, tipoMessaggio);
     }
 
-
     public void pulisciVista() {
         if (panel != null) {
             panel.removeAll();
@@ -121,40 +122,54 @@ public abstract class AbstractSchermataSwing implements Schermata {
 
     @Override
     public String getNomeTabella() {
+        // Lista per contenere tutti i nomi delle tabelle
+        List<String> allTableNames = new ArrayList<>();
+
+        // Ottieni le tabelle salvate dall'utente
         String userHome = System.getProperty("user.home");
         File directory = new File(userHome, "SerpiEScale/save");
-        if (!directory.exists() || !directory.isDirectory()) {
-            JOptionPane.showMessageDialog(frame, "Nessuna mappa salvata trovata!",
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles((dir, name) -> name.endsWith(".ser"));
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    allTableNames.add(file.getName().replace(".ser", ""));
+                    log.info("Trovata tabella: " + file.getName());
+                }
+            }
+        }
+
+        // Verifica se esiste la tabella predefinita
+        String tabellaPredefinita = "tabella_standard";
+        if (SaveLoadTabella.esisteTabellaPredefinta(tabellaPredefinita)) {
+            // Aggiungi solo se non esiste già una tabella utente con lo stesso nome
+            if (!allTableNames.contains(tabellaPredefinita)) {
+                allTableNames.add(tabellaPredefinita);
+                log.info("Trovata tabella predefinita: " + tabellaPredefinita);
+            }
+        }
+
+        // Se non ci sono tabelle, mostra un messaggio di errore
+        if (allTableNames.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Nessuna mappa trovata!",
                     "Errore", JOptionPane.ERROR_MESSAGE);
             return null;
         }
 
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".ser"));
-        if (files == null || files.length == 0) {
-            JOptionPane.showMessageDialog(frame, "Nessuna mappa salvata trovata!",
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
+        // Converti la lista in array per il JOptionPane
+        String[] tableNames = allTableNames.toArray(new String[0]);
 
-        String[] mapNames = new String[files.length];
-        for (int i = 0; i < files.length; i++) {
-            log.info(files[i].getName());
-            mapNames[i] = files[i].getName().replace(".ser", "");
-
-        }
-
-
-        String res = (String) JOptionPane.showInputDialog(
+        // Mostra il dialog per la selezione
+        String selectedTable = (String) JOptionPane.showInputDialog(
                 frame,
                 "Seleziona una mappa da caricare:",
                 "Carica Mappa",
                 JOptionPane.INFORMATION_MESSAGE,
                 null,
-                mapNames,
-                mapNames[0]
+                tableNames,
+                tableNames[0]
         );
 
-        return res;
+        return selectedTable;
     }
 
     public void gestisciErrore(){

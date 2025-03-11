@@ -8,10 +8,10 @@ import view.swing.casellaView.CasellaGraficaSwing;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
+
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -61,7 +61,7 @@ public class ScalaSwing extends JPanel implements ElementoGrafico {
         int height = Math.abs(partenza.getY() - destinazione.getY()) + partenza.getHeight();
 
         setBounds(x, y, width, height);
-        repaint(); // Ridisegna il serpente
+        repaint();
     }
 
 

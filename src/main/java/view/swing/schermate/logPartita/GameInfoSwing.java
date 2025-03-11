@@ -206,7 +206,7 @@ public class GameInfoSwing extends JPanel implements GiocoBaseModel.GiocoListene
     }
 
     @Override
-    public void onGiocoUpdated(GiocoBaseModel.StatoTurno statoTurno) {
-        updateUI(statoTurno);
+    public void onGiocoUpdated() {
+        updateUI(giocoModel.getStatoTurno());
     }
 }

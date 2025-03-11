@@ -54,8 +54,7 @@ public abstract class AbstractSchermataGiocaSwing extends AbstractSchermataSwing
         gameInfoPanel.setGiocoModel(giocoModel);
         giocoModel.addListener(gameInfoPanel);
 
-        // Hook for mode-specific initialization
-        initModeSpecific(giocoModel);
+
 
         mediator.start();
     }
@@ -139,9 +138,7 @@ public abstract class AbstractSchermataGiocaSwing extends AbstractSchermataSwing
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(2, 2, 5, 5));
 
-        JTextField nomeField = new JTextField(10);
-        inputPanel.add(new JLabel("Nome: "));
-        inputPanel.add(nomeField);
+
 
         String[] nomiColori = new String[colori.getColori().size()];
         int i = 0;
@@ -149,6 +146,11 @@ public abstract class AbstractSchermataGiocaSwing extends AbstractSchermataSwing
             nomiColori[i] = s;
             i++;
         }
+
+        JTextField nomeField = new JTextField(nomiColori[0]);
+        inputPanel.add(new JLabel("Nome: "));
+        inputPanel.add(nomeField);
+
         JComboBox<String> coloreCombo = new JComboBox<>(nomiColori);
         inputPanel.add(new JLabel("Colore: "));
         inputPanel.add(coloreCombo);

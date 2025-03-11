@@ -17,7 +17,7 @@ import java.util.List;
 @Log4j2
 
 public class SchermataGiocaSwingManuale extends AbstractSchermataGiocaSwing implements SchermataGioco {
-    private JButton lanciaDadoButton;
+    protected JButton lanciaDadoButton;
 
     @Override
     protected JPanel createButtonPanel() {

@@ -31,8 +31,6 @@ public class Giocatore {
         IN_ATTESA
     }
 
-    public void muoviGiocatore(Posizione destinazione ){
-        this.posizione=destinazione;
-    }
+
 
 }
