@@ -1,6 +1,4 @@
-import controller.gioco.Mediator;
-import controller.gioco.MediatorImpl;
-import model.casella.Posizione;
+
 import model.giocatore.Giocatore;
 import model.gioco.AbstractGiocoModel;
 import model.gioco.GiocoBaseModel;
@@ -10,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import view.swing.schermate.gioco.SchermataGiocaSwingManuale;
-import view.swing.schermate.logPartita.GameInfoSwing;
+
 
 import javax.swing.*;
 import java.awt.*;
