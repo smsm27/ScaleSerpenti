@@ -1,0 +1,1 @@
+Eseguibile presente in out/artifacts/SerpiScaleSemplificato_jar
